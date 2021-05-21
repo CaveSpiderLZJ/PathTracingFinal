@@ -106,7 +106,7 @@ Group {
         XRotate 90
         YRotate 90
         TriangleMesh {
-            obj_file mesh/bunny_200.obj
+            obj_file mesh/bunny_1k.obj
         }
     }
 }
