@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
+#include <ctime>
 #include <iostream>
 
 #include "scene_parser.hpp"
@@ -14,7 +15,7 @@
 #include <string>
 #include <queue>
 
-#define MAX_ITER 3          // 光线跟踪最大迭代次数
+#define MAX_ITER 16          // 光线跟踪最大迭代次数
 #define MIN_INTENSITY 0.001     // 光线跟踪最小光强
 #define TMIN 0.0001
 #define DELTA 0.001     
@@ -36,8 +37,9 @@ int main(int argc, char *argv[]) {
     Camera* camera = sceneParser.getCamera();
     Image img(camera->getWidth(), camera->getHeight());
     // 循环屏幕空间的像素
+    clock_t startTime = clock();
     for (int x = 0; x < camera->getWidth(); ++x){
-        if(x % 100 == 0){
+        if(x % 10 == 0){
             cout << "### x: " << x << endl;
         }
         for (int y = 0; y < camera->getHeight(); ++y){
@@ -140,6 +142,8 @@ int main(int argc, char *argv[]) {
             img.SetPixel(x, y, color);
         }
     }
+    clock_t endTime = clock();
+    cout<<"### time cost: "<< double(endTime - startTime) / CLOCKS_PER_SEC << " s" << endl;
     img.SaveBMP(outputFile.c_str());
     return 0;
 }
