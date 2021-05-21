@@ -1,0 +1,101 @@
+
+PerspectiveCamera {
+    center 21 8 12
+    direction -1 -0.4 -0.6
+    up 0 0 1
+    angle 40
+    width 512
+    height 512
+}
+
+Lights {
+    numLights 3
+    DirectionalLight {
+        direction -1 -0.2 -0.2
+        color 0.5 0.5 0.5
+    }
+    DirectionalLight {
+        direction -0.2 -1 -0.2
+        color 0.5 0.5 0.5
+    }
+    DirectionalLight {
+        direction -0.2 -0.2 -1
+        color 0.5 0.5 0.5
+    }
+}
+
+Background {
+    color 0.3 0.2 0.35
+}
+
+Materials {
+    numMaterials 4
+    Material { 
+        diffuseColor 0.9 0 0
+        Fresnel {
+            fbase 0.8
+            fscale 0
+            power 1.0
+        }
+    }
+    Material {
+        diffuseColor 0.9 0.9 0
+        Fresnel {
+            fbase 0.8
+            fscale 0
+            power 1.0
+        }
+    }
+    Material {
+        diffuseColor 0 0 0.9
+        Fresnel {
+            fbase 0.8
+            fscale 0
+            power 1.0
+        }
+    }
+    Material {
+        diffuseColor 0.83 0.8 0.9
+        refractiveIndex 1.4
+        Fresnel {
+            fbase 0.1
+            fscale 0.85
+            power 1.0
+        }
+    }
+}
+
+Group {
+    numObjects 4
+    MaterialIndex 0
+    Transform {
+        Translate 0 0 -3.5
+        Scale 4 4 0.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 1
+    Transform {
+        Translate -3.5 0 0.5
+        Scale 0.5 4 3.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 2
+    Transform {
+        Translate 0.5 -3.5 0.5
+        Scale 3.5 0.5 3.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 3
+    Transform {
+        Sphere {
+            center 0 0 0
+            radius 2
+        }
+    }
+}

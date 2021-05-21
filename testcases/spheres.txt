@@ -1,0 +1,109 @@
+
+PerspectiveCamera {
+    center 21 8 12
+    direction -1 -0.4 -0.6
+    up 0 0 1
+    angle 40
+    width 512
+    height 512
+}
+
+Lights {
+    numLights 3
+    DirectionalLight {
+        direction -1 -0.2 -0.2
+        color 0.8 0.8 0.8
+    }
+    DirectionalLight {
+        direction -0.2 -1 -0.2
+        color 0.75 0.75 0.75
+    }
+    DirectionalLight {
+        direction -0.2 -0.2 -1
+        color 0.7 0.7 0.7
+    }
+}
+
+Background {
+    color 0.43 0.4 0.45
+}
+
+Materials {
+    numMaterials 4
+    Material { 
+        diffuseColor 0.9 0.1 0.1
+        specularColor 0.9 0.1 0.1
+        shininess 20
+        Fresnel {
+            fbase 0.5
+            fscale 0
+            power 1.0
+        }
+    }
+    Material {
+        diffuseColor 0.9 0.9 0.1
+        specularColor 0.9 0.9 0.1
+        shininess 20
+        Fresnel {
+            fbase 0.5
+            fscale 0
+            power 1.0
+        }
+    }
+    Material {
+        diffuseColor 0.1 0.1 0.9
+        specularColor 0.1 0.1 0.9
+        shininess 20
+        Fresnel {
+            fbase 0.5
+            fscale 0
+            power 1.0
+        }
+    }
+    Material {
+        diffuseColor 0.11 0.61 0.56
+        specularColor 0.5 0.5 0.5
+        shininess 30
+        refractiveIndex 1.5
+        Fresnel {
+            fbase 0.01
+            fscale 0.96
+            power 15
+        }
+    }
+}
+
+Group {
+    numObjects 4
+    MaterialIndex 0
+    Transform {
+        Translate 0 0 -3.5
+        Scale 4 4 0.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 1
+    Transform {
+        Translate -3.5 0 0.5
+        Scale 0.5 4 3.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 2
+    Transform {
+        Translate 0.5 -3.5 0.5
+        Scale 3.5 0.5 3.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 3
+    Transform {
+        Sphere {
+            center -0.5 -0.5 -0.5
+            radius 2
+        }
+    }
+}
