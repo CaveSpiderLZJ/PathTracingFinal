@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 -0.4 -0.6
     up 0 0 1
     angle 40
-    width 512
-    height 512
+    width 1080
+    height 1080
 }
 
 Lights {
