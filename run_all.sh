@@ -30,5 +30,5 @@ mkdir -p output
 # bin/PA1 testcases/scene06_bunny_1k.txt output/scene06.bmp
 # bin/PA1 testcases/scene07_shine.txt output/scene07.bmp
 # bin/PA1 testcases/spheres.txt output/spheres.bmp
-# bin/PA1 testcases/bunny.txt output/bunny.bmp
-bin/PA1 testcases/dragon.txt output/dragon.bmp
+bin/PA1 testcases/bunny.txt output/bunny.bmp
+# bin/PA1 testcases/dragon.txt output/dragon.bmp

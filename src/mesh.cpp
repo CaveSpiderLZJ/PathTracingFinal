@@ -8,7 +8,7 @@
 #include <queue>
 using namespace std;
 
-#define MIN_TRIANGLE 24      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
+#define MIN_TRIANGLE 12      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
 
 bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
     // 记录所有三角形是否已经求过交，防止重复求交浪费算力
