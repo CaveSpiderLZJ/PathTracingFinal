@@ -43,21 +43,26 @@ public:
         // 判断光线是否与节点的包围盒相交
         Vector3f origin = ray.origin;
         Vector3f direction = ray.direction;
-        bool intersect3Dim = true;
+        float minTmax = 1e38;
+        float maxTmin = -1e38;
         for(int i = 0; i < 3; i++){
-            // 对每一维，检查光线是否可能经过上下限之间的区域
-            bool intersect1Dim = false;
+            // 遍历每一维，和平行面求交，更新minTmax和maxTmin
             bool isPositive = (direction[i] > 0);
-            if((isPositive && origin[i] < maxPos[i]) || 
-                (!isPositive && origin[i] > minPos[i])){
-                intersect1Dim = true;
+            float tmin, tmax;
+            if(isPositive){
+                tmin = (minPos[i] - origin[i]) / direction[i];
+                if(tmin > maxTmin) maxTmin = tmin;
+                tmax = (maxPos[i] - origin[i]) / direction[i];
+                if(tmax < minTmax) minTmax = tmax;
             }
-            if(!intersect1Dim){
-                intersect3Dim = false;
-                break;
+            else{
+                tmin = (maxPos[i] - origin[i]) / direction[i];
+                if(tmin > maxTmin) maxTmin = tmin;
+                tmax = (minPos[i] - origin[i]) / direction[i];
+                if(tmax < minTmax) minTmax = tmax;
             }
         }
-        return intersect3Dim;
+        return (minTmax >= maxTmin);
     }
 
     void getBounding(Vector3f& outMinPos, Vector3f& outMaxPos){

@@ -16,7 +16,7 @@
 #include <queue>
 
 #define MAX_ITER 16          // 光线跟踪最大迭代次数
-#define MIN_INTENSITY 0.001     // 光线跟踪最小光强
+#define MIN_INTENSITY 0.01     // 光线跟踪最小光强
 #define TMIN 0.0001
 #define DELTA 0.001     
 
@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     // 循环屏幕空间的像素
     clock_t startTime = clock();
     for (int x = 0; x < camera->getWidth(); ++x){
-        if(x % 10 == 0){
+        if(x % 50 == 0){
             cout << "### x: " << x << endl;
         }
         for (int y = 0; y < camera->getHeight(); ++y){
