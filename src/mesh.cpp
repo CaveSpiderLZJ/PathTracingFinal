@@ -8,30 +8,9 @@
 #include <queue>
 using namespace std;
 
-#define MIN_TRIANGLE 32      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
+#define MIN_TRIANGLE 24      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
 
 bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
-    // Optional: Change this brute force method into a faster one.
-    // float t = 1e38;
-    // Vector3f n;
-    // Material* m;
-    // bool isIntersected = false;
-    // for (int triId = 0; triId < (int) triangles.size(); ++triId) {
-    //     TriangleIndex& triIndex = triangles[triId];
-    //     Triangle triangle(vertices[triIndex[0]],
-    //                       vertices[triIndex[1]], vertices[triIndex[2]], material);
-    //     //triangle.normal = n[triId];
-    //     if(triangle.intersect(ray, hit, tmin) && hit.getT() < t){
-    //         isIntersected = true;
-    //         t = hit.getT();
-    //         n = hit.getNormal();
-    //         m = hit.getMaterial();
-    //     }
-    // }
-    // if(!isIntersected) return false;
-    // hit.set(t, m, n);
-    // return true;
-
     // 记录所有三角形是否已经求过交，防止重复求交浪费算力
     bool* hasIntersected = new bool[triangles.size()];
     for(int i = 0; i < triangles.size(); i++){
@@ -44,12 +23,13 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
     nodes.push(root);
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();
+        bool currentIntersected = currentNode->intersect(ray);
         if(currentNode == nullptr){
             cout << "!!! nullptr found in queue" << endl;
             nodes.pop();
             continue;
         }
-        else if(currentNode->intersect(ray)){
+        else if(currentIntersected){
             // 光线和当前节点的包围盒有交点
             if(currentNode->leftChild == nullptr && currentNode->rightChild == nullptr){
                 // 当前节点为叶子结点
@@ -168,9 +148,8 @@ void Mesh::computeNormal() {
 
 void Mesh::initBSP(){
     // 根据已经初始化的三角形面片，建立BSP树
-    //cout << "### init BSP() called." << endl;
-    Vector3f minPos = Vector3f(1e38);
-    Vector3f maxPos = Vector3f(-1e38);
+    Vector3f minPos = Vector3f(1e8, 1e8, 1e8);
+    Vector3f maxPos = Vector3f(-1e8, -1e8, -1e8);
     for(int i = 0; i < vertices.size(); i++){
         for(int j = 0; j < 3; j++){
             if(vertices[i][j] < minPos[j])
@@ -179,22 +158,14 @@ void Mesh::initBSP(){
                 maxPos[j] = vertices[i][j];
         }
     }
-    //cout << "### position 1" << endl;
     root = new BSPNode(minPos, maxPos, 0);
     queue<BSPNode*> nodes;      // 待计算并扩展的节点队列
     nodes.push(root);
     while(!nodes.empty()){
-        //cout << "### size: " << nodes.size() << endl;
-        //cout << "### while entered" << endl;
         BSPNode* currentNode = nodes.front();
-        //cout << "### x: " << currentNode->maxPos[0] - currentNode->minPos[0];
-        //cout << " y: " << currentNode->maxPos[1] - currentNode->minPos[1];
-        //cout << " z: " << currentNode->maxPos[2] - currentNode->minPos[2] << endl;
-        // cout << "### " << (currentNode == root) << endl;
         computeTriangle(currentNode);
         if(currentNode->triangleIdx.size() > MIN_TRIANGLE){
             // 当前节点的三角形超过了下限，继续扩展
-            //cout << "### if entered" << endl;
             int nextPartition = currentNode->nextPartition;
             currentNode->getBounding(minPos, maxPos);
             float mean = (minPos[nextPartition] + maxPos[nextPartition]) / 2.0f;
@@ -206,12 +177,9 @@ void Mesh::initBSP(){
             maxPos[nextPartition] = tmpMax;
             currentNode->rightChild = new BSPNode(minPos, maxPos, (nextPartition + 1) % 3, currentNode);
             nodes.push(currentNode->rightChild);
-            //cout << "### if exited." << endl;
         }
         nodes.pop();
-        //cout << "### while exited." << endl;
     }
-    //cout << "### init BSP() exited." << endl;
     return;
 }
 
@@ -256,11 +224,5 @@ void Mesh::computeTriangle(BSPNode* node){
             if(inside) node->triangleIdx.push_back(father->triangleIdx[i]);
         }
     }
-    // cout << "### triangle size: " << node->triangleIdx.size() << endl;
-    // cout << "### ";
-    // for(int i = 0; i < node->triangleIdx.size(); i++){
-    //     cout << node->triangleIdx[i] << ' ';
-    // }
-    // cout << endl;
     return;
 }
