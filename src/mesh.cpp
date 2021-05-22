@@ -12,7 +12,6 @@ using namespace std;
 
 bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
     // 记录所有三角形是否已经求过交，防止重复求交浪费算力
-    bool* hasIntersected = new bool[triangles.size()];
     for(int i = 0; i < triangles.size(); i++){
         hasIntersected[i] = false;
     }
@@ -51,7 +50,6 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
         // 当前节点包围盒和光线不相交，直接弹出
         nodes.pop();
     }
-    delete[] hasIntersected;
     // 至此，获得全部可能相交的三角形编号
     float t = 1e38;
     Vector3f n;
@@ -133,6 +131,27 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     }
     f.close();
     initBSP();
+    hasIntersected = new bool[triangles.size()];
+}
+
+Mesh::~Mesh(){
+    delete[] hasIntersected;
+    vector<BSPNode*> nodes;
+    nodes.push_back(root);
+    int head = 0, tail = 1;
+    while(head < tail){
+        BSPNode* currentNode = nodes[head];
+        if(currentNode->leftChild != nullptr){
+            nodes.push_back(currentNode->leftChild);
+            nodes.push_back(currentNode->rightChild);
+            tail += 2;
+        }
+        head++;
+    }
+    for(int i = nodes.size() - 1; i >= 0; i--){
+        delete nodes[i];
+    }
+    return;
 }
 
 void Mesh::computeNormal() {

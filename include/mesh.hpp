@@ -95,9 +95,11 @@ public:
     vector<TriangleIndex> triangles;
     vector<Vector3f> normals;
     BSPNode* root;
+    bool* hasIntersected;
 
     bool intersect(const Ray &r, Hit &h, float tmin) override;
     Mesh(const char *filename, Material *m);
+    ~Mesh();
 
     void initBSP();      // 初始化BST树
     void computeTriangle(BSPNode* node);
