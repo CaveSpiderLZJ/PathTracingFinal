@@ -16,7 +16,7 @@
 #include <queue>
 
 #define MAX_ITER 16          // 光线跟踪最大迭代次数
-#define MIN_INTENSITY 0.03     // 光线跟踪最小光强
+#define MIN_INTENSITY 0.01     // 光线跟踪最小光强
 #define TMIN 0.0001
 #define DELTA 0.001     
 
