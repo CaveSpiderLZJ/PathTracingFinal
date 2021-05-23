@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
     Image img(camera->getWidth(), camera->getHeight());
     // 循环屏幕空间的像素
     clock_t startTime = clock();
+    #pragma omp parallel for
     for (int x = 0; x < camera->getWidth(); ++x){
         if(x % 50 == 0){
             cout << "### x: " << x << endl;
@@ -64,10 +65,16 @@ int main(int argc, char *argv[]) {
                     for (int lightIdx = 0; lightIdx < sceneParser.getNumLights(); ++lightIdx) {
                         Light* light = sceneParser.getLight(lightIdx);
                         Vector3f dir2Light, lightColor;
+                        float distance;
                         // 获得光照强度
-                        light->getIllumination(currentRay.pointAtParameter(hit.t), dir2Light, lightColor);
-                        // 计算局部光强
-                        tmpColor += hit.material->Shade(currentRay, hit, dir2Light, lightColor);
+                        light->getIllumination(currentRay.pointAtParameter(hit.t),
+                            dir2Light, lightColor, distance);
+                        Hit tmpHit;
+                        Ray tmpRay(currentRay.pointAtParameter(hit.t), dir2Light);
+                        if(!(baseGroup->intersect(tmpRay, tmpHit, TMIN) && tmpHit.t < distance)){
+                            // 计算局部光强
+                            tmpColor += hit.material->Shade(currentRay, hit, dir2Light, lightColor);
+                        }
                     }
                     // 计算反射光线和折射光线，加入队列
                     Vector3f origin = currentRay.pointAtParameter(hit.t);

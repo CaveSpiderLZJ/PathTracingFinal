@@ -10,7 +10,8 @@ public:
 
     virtual ~Light() = default;
 
-    virtual void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const = 0;
+    virtual void getIllumination(const Vector3f &p, Vector3f &dir,
+        Vector3f &col, float& dis) const = 0;
 };
 
 
@@ -27,11 +28,14 @@ public:
 
     ///@param p unsed in this function
     ///@param distanceToLight not well defined because it's not a point light
-    void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override {
+    void getIllumination(const Vector3f &p, Vector3f &dir,
+        Vector3f &col, float& dis) const override {
         // the direction to the light is the opposite of the
         // direction of the directional light source
+        // dis 返回p到光源的距离，平行光默认来自正无穷远
         dir = -direction;
         col = color;
+        dis = 1e38;
     }
 
 private:
@@ -52,11 +56,14 @@ public:
 
     ~PointLight() override = default;
 
-    void getIllumination(const Vector3f &p, Vector3f &dir, Vector3f &col) const override {
+    void getIllumination(const Vector3f &p, Vector3f &dir,
+        Vector3f &col, float& dis) const override {
         // the direction to the light is the opposite of the
         // direction of the directional light source
+        // dis返回p到点光源的距离
         dir = (position - p);
-        dir = dir / dir.length();
+        dis = dir.length();
+        dir.normalize();
         col = color;
     }
 
