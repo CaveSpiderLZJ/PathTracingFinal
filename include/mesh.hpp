@@ -7,14 +7,12 @@
 #include "Vector2f.h"
 #include "Vector3f.h"
 
-using namespace std;
-
 class BSPNode{
 
 public:
 
     // 节点包含的所有三角形编号，对应Mesh::trangles
-    vector<int> triangleIdx;
+    std::vector<int> triangleIdx;
     // 空间二分树父亲和两个孩子
     BSPNode* father;
     BSPNode* leftChild;
@@ -47,6 +45,7 @@ public:
         float maxTmin = -1e38;
         for(int i = 0; i < 3; i++){
             // 遍历每一维，和平行面求交，更新minTmax和maxTmin
+            if(direction[i] == 0.0f) continue;
             bool isPositive = (direction[i] > 0);
             float tmin, tmax;
             if(isPositive){
@@ -91,9 +90,9 @@ public:
         // By Computer Graphics convention, counterclockwise winding is front face
     };
 
-    vector<Vector3f> vertices;
-    vector<TriangleIndex> triangles;
-    vector<Vector3f> normals;
+    std::vector<Vector3f> vertices;
+    std::vector<TriangleIndex> triangles;
+    std::vector<Vector3f> normals;
     BSPNode* root;
     bool* hasIntersected;
 

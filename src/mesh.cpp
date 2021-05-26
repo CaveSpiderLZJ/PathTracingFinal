@@ -6,7 +6,6 @@
 #include <utility>
 #include <sstream>
 #include <queue>
-using namespace std;
 
 #define MIN_TRIANGLE 12      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
 
@@ -16,15 +15,15 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
         hasIntersected[i] = false;
     }
     // 所有可能有交点的三角形id，重复三角形不往里面加
-    vector<int> candidates;
+    std::vector<int> candidates;
     // 有可能有交点的BSP树节点队列，队列中不一定所有包围盒都和光线有交点
-    queue<BSPNode*> nodes;
+    std::queue<BSPNode*> nodes;
     nodes.push(root);
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();
         bool currentIntersected = currentNode->intersect(ray);
         if(currentNode == nullptr){
-            cout << "!!! nullptr found in queue" << endl;
+            std::cout << "!!! nullptr found in queue" << std::endl;
             nodes.pop();
             continue;
         }
@@ -136,7 +135,7 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
 
 Mesh::~Mesh(){
     delete[] hasIntersected;
-    vector<BSPNode*> nodes;
+    std::vector<BSPNode*> nodes;
     nodes.push_back(root);
     int head = 0, tail = 1;
     while(head < tail){
@@ -178,7 +177,7 @@ void Mesh::initBSP(){
         }
     }
     root = new BSPNode(minPos, maxPos, 0);
-    queue<BSPNode*> nodes;      // 待计算并扩展的节点队列
+    std::queue<BSPNode*> nodes;      // 待计算并扩展的节点队列
     nodes.push(root);
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();

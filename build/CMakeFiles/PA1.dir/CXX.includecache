@@ -193,9 +193,11 @@ cstring
 -
 cmath
 -
-ctime
+sys/time.h
 -
 iostream
+-
+iomanip
 -
 scene_parser.hpp
 /mnt/d/vsc/CG/Final/code/src/scene_parser.hpp
@@ -211,6 +213,8 @@ string
 -
 queue
 -
+omp.h
+/mnt/d/vsc/CG/Final/code/src/omp.h
 
 /mnt/d/vsc/CG/Final/code/src/mesh.cpp
 mesh.hpp
