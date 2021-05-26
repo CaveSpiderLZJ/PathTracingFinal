@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 128
-    height 128
+    width 300
+    height 300
 }
 
 Lights {
@@ -21,7 +21,7 @@ Background {
 }
 
 Materials {
-    numMaterials 8
+    numMaterials 9
     Material { 
         diffuseColor 0.9 0.88 0.85
         specularColor 0.09 0.088 0.085
@@ -58,9 +58,9 @@ Materials {
         shininess 30
         refractiveIndex 1.5
         Fresnel {
-            fbase 0.08
-            fscale 0.87
-            power 10
+            fbase 0.05
+            fscale 0.92
+            power 25
         }
     }
     Material {
@@ -68,7 +68,7 @@ Materials {
         specularColor 0.1 0.084 0
         shininess 30
         Fresnel {
-            fbase 0.4
+            fbase 0.3
             fscale 0
             power 1
         }
@@ -100,6 +100,16 @@ Materials {
             fbase 0.1
             fscale 0
             power 1
+        }
+    }
+    Material {
+        diffuseColor 1 0.8 0.1
+        refractiveIndex 1.5
+        luminance 5 4 0.5
+        Fresnel {
+            fbase 0.03
+            fscale 0.82
+            power 25
         }
     }
 }
@@ -153,7 +163,7 @@ Group {
             radius 2
         }
     }
-    MaterialIndex 3
+    MaterialIndex 8
     Transform {
         Sphere {
             center 2 2 -3.5
@@ -169,8 +179,8 @@ Group {
     }
     MaterialIndex 7
     Transform {
-        Translate 0 0 4.95
-        Scale 3 3 0.05
+        Translate 0 0 4.8
+        Scale 3 3 0.2
         TriangleMesh {
             obj_file mesh/cube.obj
         }

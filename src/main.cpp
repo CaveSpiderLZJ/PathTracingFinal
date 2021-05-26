@@ -18,12 +18,12 @@
 #include "omp.h"
 
 #define MAX_ITER 16             // 光线跟踪最大迭代次数
-#define MIN_INTENSITY 0.001      // 光线跟踪最小光强
+#define MIN_INTENSITY 0.01      // 光线跟踪最小光强
 #define TMIN 0.0001
 #define DELTA 0.001
-#define PROGRESS_NUM 20         // 画图时进度信息数目 
-#define SAMPLING_TIMES 100       // 蒙特卡洛光线追踪采样率
-#define THREAD_NUM 10             // 线程数
+#define PROGRESS_NUM 5         // 画图时进度信息数目 
+#define SAMPLING_TIMES 500       // 蒙特卡洛光线追踪采样率
+#define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
     // 输入折射率，反射率，用轮盘赌决定光线种类，折射反射漫反射返回012
@@ -45,131 +45,23 @@ Vector3f randDirection(const Vector3f& normal){
     return res.normalized();
 }
 
-void phongRayTracing(SceneParser* sceneParser, Camera* camera, Image* img){
-    // 使用Phong模型加简单光线追踪渲染img
-    int progress = camera->getWidth() / PROGRESS_NUM;
-    for (int x = 0; x < camera->getWidth(); ++x){
-        if((x + 1) % progress == 0){
-            std::cout << std::fixed << std::setprecision(2) <<
-                 "### progress: " << float(x) / camera->getWidth() << std::endl;
-        }
-        for (int y = 0; y < camera->getHeight(); ++y){
-            Vector3f color = Vector3f::ZERO;
-            Ray camRay = sceneParser->getCamera()->generateRay(Vector2f(x, y));
-            Group* baseGroup = sceneParser->getGroup();
-            // 开一个队列，储存待处理的光线，最开始只有相机视线
-            std::queue<Ray> rays;
-            rays.push(camRay);
-            // 循环对队列中每束光线求交，每次求交并shade产生一个颜色和反射折射两束光线
-            // 光束能量分成反射、折射和吸收三部分，每次用吸收权值乘以渲染出来的颜色累加到color中
-            // 用反射和折射权值生成新的光线加入队列
-            while(rays.empty() == false){
-                Ray currentRay = rays.front();
-                Hit hit;
-                bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN);
-                Vector3f normal = hit.normal.normalized();
-                if(isIntersect){
-                    // 当前光线和场景有交点
-                    Vector3f tmpColor = Vector3f::ZERO;
-                    // 找到交点之后，累加来自所有光源的光强影响
-                    for (int lightIdx = 0; lightIdx < sceneParser->getNumLights(); ++lightIdx) {
-                        Light* light = sceneParser->getLight(lightIdx);
-                        Vector3f dir2Light, lightColor;
-                        float distance;
-                        // 获得光照强度
-                        light->getIllumination(currentRay.pointAtParameter(hit.t),
-                            dir2Light, lightColor, distance);
-                        Hit tmpHit;
-                        Ray tmpRay(currentRay.pointAtParameter(hit.t), dir2Light);
-                        if(!(baseGroup->intersect(tmpRay, tmpHit, TMIN) && tmpHit.t < distance)){
-                            // 计算局部光强
-                            tmpColor += hit.material->Shade(currentRay, hit, dir2Light, lightColor);
-                        }
-                    }
-                    // 计算反射光线和折射光线，加入队列
-                    Vector3f origin = currentRay.pointAtParameter(hit.t);
-                    // 计算反射光线方向，两种情况一样
-                    Vector3f foot = origin + normal * 
-                        Vector3f::dot(currentRay.origin - origin, normal);
-                    Vector3f reflectDirection = (2 * foot - currentRay.origin - origin).normalized();
-                    // 计算折射光线方向、反射光强和折射光强，分两种情况讨论
-                    // 反射率 + 折射率 + 透射率 == 1
-                    float reflectIntensity = 0.0f;
-                    float refractIntensity = 0.0f;
-                    Vector3f refractDirection;
-                    Material* material = hit.material;
-                    Fresnel fresnel = material->fresnel;
-                    float dotIN = -1 * Vector3f::dot(currentRay.direction.normalized(), normal);
-                    bool reflectIsOutside = true;
-                    if(currentRay.isOutside){
-                        //光疏到光密，正常计算
-                        reflectIsOutside = true;
-                        reflectIntensity = fresnel.fbase + fresnel.fscale * pow((1.0f - dotIN), fresnel.power);
-                        refractIntensity = fresnel.fbase + fresnel.fscale - reflectIntensity;
-                        float sinS = sqrt(1.0f - dotIN * dotIN) / material->refractiveIndex;
-                        float tanS = sqrt((sinS*sinS) / (1.0f - sinS*sinS));
-                        refractDirection = (tanS * ((foot - currentRay.origin).normalized())
-                            - normal).normalized();
-                    }
-                    else{
-                        // 光密到光疏，注意临界折射角
-                        reflectIsOutside = false;
-                        float sinS = sqrt(1.0f - dotIN * dotIN) * material->refractiveIndex;
-                        if(sinS >= 1.0f){
-                            // 到达临界角，发生全反射
-                            refractIntensity = 0.0f;
-                            reflectIntensity = fresnel.fbase + fresnel.fscale;
-                        }
-                        else{
-                            // 没有全反射，定义线性放缩倍数eta
-                            float eta = 1.0f / pow(1.0f - sqrt(1.0f - (1.0f / 
-                                ((material->refractiveIndex)*(material->refractiveIndex)))), fresnel.power);
-                            reflectIntensity = fresnel.fbase + fresnel.fscale *
-                                eta * pow(1.0f - dotIN, fresnel.power);
-                            refractIntensity = fresnel.fbase + fresnel.fscale - reflectIntensity;
-                            float tanS = sqrt((sinS*sinS) / (1.0f - sinS*sinS));
-                            refractDirection = (tanS * ((foot - currentRay.origin).normalized())
-                                - normal).normalized();
-                        }
-                    }
-                    color += (1.0f - reflectIntensity - refractIntensity) * 
-                        currentRay.intensity * tmpColor;
-                    // 根据光强筛选出可用的光线加入队列
-                    if(currentRay.intensity * reflectIntensity >= MIN_INTENSITY){
-                        rays.push(Ray(origin + DELTA * reflectDirection, reflectDirection,
-                            currentRay.intensity * reflectIntensity, reflectIsOutside));
-                    }
-                    else if(reflectIsOutside){
-                        color += reflectIntensity * currentRay.intensity * tmpColor;
-                    }
-                    if(currentRay.intensity * refractIntensity >= MIN_INTENSITY){
-                        rays.push(Ray(origin + DELTA * refractDirection, refractDirection,
-                            currentRay.intensity * refractIntensity, !reflectIsOutside));
-                    }
-                    else if(!reflectIsOutside){
-                        color += refractIntensity * currentRay.intensity * tmpColor;
-                    }
-                }   
-                else{
-                    // 当前光线和场景没有交点
-                    color += currentRay.getIntensity() * sceneParser->getBackgroundColor();
-                }
-                rays.pop();
-            }
-            img->SetPixel(x, y, color);
-        }
-    }
-}
-
-void mcRayTracing(SceneParser* sceneParser, Camera* camera, Image* img){
+void mcRayTracing(std::string inputFile, Image* img, int threadID){
     // 蒙特卡罗光线追踪
-    int progress = camera->getWidth() / PROGRESS_NUM;
-    Group* baseGroup = sceneParser->getGroup();
-    #pragma omp parallel for num_threads(THREAD_NUM)
-    for(int x = 0; x < camera->getWidth(); x++){
-        if((x + 1) % progress == 0){
+    SceneParser sceneParser(inputFile.c_str());
+    Camera* camera = sceneParser.getCamera();
+    Group* baseGroup = sceneParser.getGroup();
+    // 定义绘图边界
+    int startX = (float(threadID) / THREAD_NUM) * camera->getWidth();
+    int endX;
+    if(threadID == THREAD_NUM - 1)
+        endX = camera->getWidth();
+    else endX = (float(threadID + 1) / THREAD_NUM) * camera->getWidth();
+    int progress = (endX - startX) / PROGRESS_NUM;
+    for(int x = startX; x < endX; x++){
+        if((x + 1 - startX) % progress == 0){
             std::cout << std::fixed << std::setprecision(2) <<
-                 "### progress: " << float(x) / camera->getWidth() << std::endl;
+                 "### thread " << threadID << ' ' << std::fixed << std::setprecision(3)
+                    << float(x-startX) / (endX-startX) << " finished." << std::endl;
         }
         for(int y = 0; y < camera->getHeight(); y++){
             Vector3f color = Vector3f::ZERO;
@@ -177,7 +69,7 @@ void mcRayTracing(SceneParser* sceneParser, Camera* camera, Image* img){
             for(int _ = 0; _ < SAMPLING_TIMES; _++){
                 // 蒙特卡洛采样SAMPLING_TIMES次
                 Vector3f tmpColor = Vector3f::ZERO;
-                Ray currentRay = sceneParser->getCamera()->generateRay(Vector2f(x, y));
+                Ray currentRay = camera->generateRay(Vector2f(x, y));
                 while(true){
                     // 进行一次采样，结果储存在tmpColor中
                     Hit hit;
@@ -230,10 +122,8 @@ void mcRayTracing(SceneParser* sceneParser, Camera* camera, Image* img){
                         // 至此，折射率、反射率、折射方向和反射方向已经计算完毕
                         // 根据当前物体亮度更新tmpColor
                         int type = randType(reflectIntensity, refractIntensity);
-                        if(type == 2){
-                            currentRay.pastColor += currentRay.intensity * diffuseIntensity
+                        currentRay.pastColor += currentRay.intensity * diffuseIntensity
                             * material->diffuseColor;
-                        }
                         tmpColor += currentRay.intensity * diffuseIntensity
                             * material->luminance * currentRay.pastColor;
                         // 轮盘赌确定下一次光线是反射折射还是漫反射
@@ -277,7 +167,7 @@ void mcRayTracing(SceneParser* sceneParser, Camera* camera, Image* img){
                     }
                     else{
                         // 没有交点，返回背景色
-                        tmpColor += currentRay.intensity * sceneParser->getBackgroundColor();
+                        tmpColor += currentRay.intensity * sceneParser.getBackgroundColor();
                         break;
                     }
                 }
@@ -311,7 +201,11 @@ int main(int argc, char *argv[]) {
     // 循环屏幕空间的像素
     struct timeval start, end; 
     gettimeofday(&start, NULL);
-    mcRayTracing(&sceneParser, camera, &img);
+    #pragma omp parallel num_threads(THREAD_NUM)
+    {
+        int threadID = omp_get_thread_num();
+        mcRayTracing(inputFile, &img, threadID);
+    }
     gettimeofday(&end, NULL);
     float timecost = (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)/1e6;
     std::cout << "### time cost: " << timecost << " s" << std::endl;
