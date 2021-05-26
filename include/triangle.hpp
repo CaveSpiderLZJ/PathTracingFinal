@@ -33,15 +33,14 @@ public:
         Vector3f S = vertices[0] - ray.getOrigin();
         Vector3f Rd = ray.getDirection().normalized();
         float divisor = Matrix3f(Rd, E1, E2).determinant();
-        if(divisor == 0){
-            return false;
-        }
+        if(divisor == 0.0f) return false;
         // t, beta, gamma
         Vector3f res = Vector3f(Matrix3f(S, E1, E2).determinant(),
                                 Matrix3f(Rd, S, E2).determinant(),
                                 Matrix3f(Rd, E1, S).determinant()) / divisor;
-        if(res[0] < tmin || res[1] < 0 || res[1] > 1 || res[2] < 0 || res[2] > 1 || res[1] + res[2] > 1)
+        if(res[0] < tmin || res[1] < 0.0f || res[2] < 0.0f || res[1] + res[2] > 1.0f){
             return false;
+        }
         Vector3f n;
         if(Vector3f::dot(Rd, normal) > 0) n = -1 * normal;
         else n = normal;

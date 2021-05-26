@@ -45,6 +45,7 @@ public:
         float maxTmin = -1e38;
         for(int i = 0; i < 3; i++){
             // 遍历每一维，和平行面求交，更新minTmax和maxTmin
+            if(direction[i] == 0.0f) continue;
             bool isPositive = (direction[i] > 0);
             float tmin, tmax;
             if(isPositive){
