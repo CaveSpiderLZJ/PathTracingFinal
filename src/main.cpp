@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cmath>
-#include <ctime>
+#include <sys/time.h>
 #include <iostream>
 #include <iomanip>
 
@@ -15,13 +15,15 @@
 
 #include <string>
 #include <queue>
+#include "omp.h"
 
 #define MAX_ITER 16             // 光线跟踪最大迭代次数
-#define MIN_INTENSITY 0.01      // 光线跟踪最小光强
+#define MIN_INTENSITY 0.001      // 光线跟踪最小光强
 #define TMIN 0.0001
 #define DELTA 0.001
 #define PROGRESS_NUM 20         // 画图时进度信息数目 
-#define SAMPLING_TIMES 10       // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 100       // 蒙特卡洛光线追踪采样率
+#define THREAD_NUM 10             // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
     // 输入折射率，反射率，用轮盘赌决定光线种类，折射反射漫反射返回012
@@ -163,6 +165,7 @@ void mcRayTracing(SceneParser* sceneParser, Camera* camera, Image* img){
     // 蒙特卡罗光线追踪
     int progress = camera->getWidth() / PROGRESS_NUM;
     Group* baseGroup = sceneParser->getGroup();
+    #pragma omp parallel for num_threads(THREAD_NUM)
     for(int x = 0; x < camera->getWidth(); x++){
         if((x + 1) % progress == 0){
             std::cout << std::fixed << std::setprecision(2) <<
@@ -306,10 +309,12 @@ int main(int argc, char *argv[]) {
     Camera* camera = sceneParser.getCamera();
     Image img(camera->getWidth(), camera->getHeight());
     // 循环屏幕空间的像素
-    clock_t startTime = clock();
+    struct timeval start, end; 
+    gettimeofday(&start, NULL);
     mcRayTracing(&sceneParser, camera, &img);
-    clock_t endTime = clock();
-    std::cout<<"### time cost: "<< double(endTime - startTime) / CLOCKS_PER_SEC << " s" << std::endl;
+    gettimeofday(&end, NULL);
+    float timecost = (end.tv_sec - start.tv_sec) + (end.tv_usec - start.tv_usec)/1e6;
+    std::cout << "### time cost: " << timecost << " s" << std::endl;
     img.SaveBMP(outputFile.c_str());
     return 0;
 }

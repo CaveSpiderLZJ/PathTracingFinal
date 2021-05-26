@@ -193,7 +193,7 @@ cstring
 -
 cmath
 -
-ctime
+sys/time.h
 -
 iostream
 -
@@ -213,6 +213,8 @@ string
 -
 queue
 -
+omp.h
+/mnt/d/vsc/CG/Final/code/src/omp.h
 
 /mnt/d/vsc/CG/Final/code/src/mesh.cpp
 mesh.hpp
