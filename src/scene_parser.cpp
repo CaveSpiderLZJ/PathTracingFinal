@@ -241,6 +241,7 @@ Material *SceneParser::parseMaterial() {
     char filename[MAX_PARSER_TOKEN_LENGTH];
     filename[0] = 0;
     Vector3f diffuseColor(1, 1, 1), specularColor(0, 0, 0);
+    Vector3f luminance = Vector3f::ZERO;    // 默认物体不发光
     float shininess = 0;
     float refractiveIndex = 1.0f;
     Fresnel fresnel;
@@ -252,6 +253,8 @@ Material *SceneParser::parseMaterial() {
             diffuseColor = readVector3f();
         else if(strcmp(token, "specularColor") == 0)
             specularColor = readVector3f();
+        else if(strcmp(token, "luminance") == 0)
+            luminance = readVector3f();
         else if(strcmp(token, "shininess") == 0)
             shininess = readFloat();
         else if(strcmp(token, "refractiveIndex") == 0)
@@ -266,7 +269,7 @@ Material *SceneParser::parseMaterial() {
             break;
         }
     }
-    auto *answer = new Material(diffuseColor, specularColor, shininess, refractiveIndex, fresnel);
+    auto *answer = new Material(diffuseColor, specularColor, luminance, shininess, refractiveIndex, fresnel);
     return answer;
 }
 

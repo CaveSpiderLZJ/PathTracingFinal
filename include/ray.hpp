@@ -13,15 +13,18 @@ public:
 
     Vector3f origin;
     Vector3f direction;
+    Vector3f pastColor;     // 记录光线之前叠加的颜色
     float intensity;
     bool isOutside;
 
     Ray() = delete;
 
     Ray(const Vector3f& _origin, const Vector3f& _direction,
+        const Vector3f& _pastColor = Vector3f::ZERO,
         const float& _intensity = 1.0f, bool _isOutside = true) {
         origin = _origin;
         direction = _direction.normalized();
+        pastColor = _pastColor;
         intensity = _intensity;
         isOutside = _isOutside;
     }
@@ -29,6 +32,7 @@ public:
     Ray(const Ray &ray) {
         origin = ray.origin;
         direction = ray.direction.normalized();
+        pastColor = ray.pastColor;
         intensity = ray.intensity;
         isOutside = ray.isOutside;
     }

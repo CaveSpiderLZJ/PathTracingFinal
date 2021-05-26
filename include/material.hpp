@@ -28,6 +28,7 @@ public:
 
     Vector3f diffuseColor;
     Vector3f specularColor;
+    Vector3f luminance;
     float shininess;
     float refractiveIndex;
     Fresnel fresnel;
@@ -35,8 +36,8 @@ public:
     Material() = delete;
 
     explicit Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor = Vector3f::ZERO,
-        float _shininess = 0, float _refractiveIndex = 1.0f, Fresnel _fresnel = Fresnel()):
-        diffuseColor(_diffuseColor), specularColor(_specularColor), 
+        const Vector3f& _luminance = Vector3f::ZERO, float _shininess = 0, float _refractiveIndex = 1.0f, Fresnel _fresnel = Fresnel()):
+        diffuseColor(_diffuseColor), specularColor(_specularColor), luminance(_luminance),
         shininess(_shininess), refractiveIndex(_refractiveIndex), fresnel(_fresnel) {}
 
     virtual ~Material() = default;

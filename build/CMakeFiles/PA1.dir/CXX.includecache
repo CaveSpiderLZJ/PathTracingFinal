@@ -197,6 +197,8 @@ ctime
 -
 iostream
 -
+iomanip
+-
 scene_parser.hpp
 /mnt/d/vsc/CG/Final/code/src/scene_parser.hpp
 image.hpp

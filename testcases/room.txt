@@ -1,11 +1,11 @@
 
 PerspectiveCamera {
-    center 25 0 0
+    center 20 0 0
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 512
-    height 512
+    width 128
+    height 128
 }
 
 Lights {
@@ -21,7 +21,7 @@ Background {
 }
 
 Materials {
-    numMaterials 7
+    numMaterials 8
     Material { 
         diffuseColor 0.9 0.88 0.85
         specularColor 0.09 0.088 0.085
@@ -37,7 +37,7 @@ Materials {
         specularColor 0.09 0.01 0.01
         shininess 5
         Fresnel {
-            fbase 0.3
+            fbase 0.1
             fscale 0
             power 1
         }
@@ -47,7 +47,7 @@ Materials {
         specularColor 0.01 0.01 0.09
         shininess 5
         Fresnel {
-            fbase 0.3
+            fbase 0.1
             fscale 0
             power 1
         }
@@ -93,6 +93,15 @@ Materials {
             power 1
         }
     }
+    Material {
+        diffuseColor 1 1 1
+        luminance 1.2 1.2 1.2
+        Fresnel {
+            fbase 0.1
+            fscale 0
+            power 1
+        }
+    }
 }
 
 Group {
@@ -100,6 +109,14 @@ Group {
     MaterialIndex 0
     Transform {
         Translate -5.5 0 0
+        Scale 0.5 5 5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 0
+    Transform {
+        Translate 24.5 0 0
         Scale 0.5 5 5
         TriangleMesh {
             obj_file mesh/cube.obj
@@ -140,36 +157,28 @@ Group {
     MaterialIndex 4
     Transform {
         Sphere {
-            center -1 -0.5 -3
+            center -3 -0.5 -3
             radius 2
         }
     }
     MaterialIndex 3
     Transform {
         Sphere {
-            center 4 1.5 -3.5
+            center 2 2 -3.5
             radius 1.5
         }
     }
     MaterialIndex 3
     Transform {
         Sphere {
-            center 7 -1.5 -4
+            center 5 -2 -4
             radius 1
         }
     }
-    MaterialIndex 5
+    MaterialIndex 7
     Transform {
-        Translate -2.5 3.5 -1
-        Scale  2.5 1.5 4
-        TriangleMesh {
-            obj_file mesh/cube.obj
-        }
-    }
-    MaterialIndex 6
-    Transform {
-        Translate 4 -3 -3.5
-        Scale  1 1 1.5
+        Translate 0 0 4.95
+        Scale 3 3 0.05
         TriangleMesh {
             obj_file mesh/cube.obj
         }

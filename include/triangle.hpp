@@ -7,7 +7,6 @@
 #include <vecmath.h>
 #include <cmath>
 #include <iostream>
-using namespace std;
 
 // TODO: implement this class and add more fields as necessary,
 class Triangle: public Object3D {
