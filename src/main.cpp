@@ -19,7 +19,7 @@
 
 #define MAX_ITER 16             // 光线跟踪最大迭代次数
 #define MIN_INTENSITY 0.01      // 光线跟踪最小光强
-#define TMIN 0.0001
+#define TMIN 0.001
 #define DELTA 0.001
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
 #define SAMPLING_TIMES 500       // 蒙特卡洛光线追踪采样率
@@ -40,7 +40,7 @@ Vector3f randDirection(const Vector3f& normal){
     Vector3f res = Vector3f::ZERO;
     do{
         for(int i = 0; i < 3; i++)
-            res[i] = float(rand()) / (RAND_MAX >> 1) - 1.0f;
+            res[i] = normal[i] + (float(rand()) / (RAND_MAX >> 1) - 1.0f);
     }while(Vector3f::dot(res, normal) <= 0);
     return res.normalized();
 }
