@@ -17,12 +17,13 @@
 #include <queue>
 #include "omp.h"
 
-#define MAX_ITER 16             // 光线跟踪最大迭代次数
+#define MAX_DEPTH 10            // 光线跟踪最大迭代次数
+#define RR 5                    // 俄罗斯轮盘赌终结
 #define MIN_INTENSITY 0.01      // 光线跟踪最小光强
-#define TMIN 0.001
-#define DELTA 0.001
+#define TMIN 1e-3
+#define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 500       // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 100     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
@@ -45,6 +46,12 @@ Vector3f randDirection(const Vector3f& normal){
     return res.normalized();
 }
 
+Vector3f clampedColor(Vector3f color){
+    for(int i = 0; i < 3; i++)
+        color[i] = color[i] < 0 ? 0 : (color[i] > 1 ? 1 : color[i]);
+    return color;
+}
+
 void mcRayTracing(std::string inputFile, Image* img, int threadID){
     // 蒙特卡罗光线追踪
     SceneParser sceneParser(inputFile.c_str());
@@ -65,13 +72,12 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
         }
         for(int y = 0; y < camera->getHeight(); y++){
             Vector3f color = Vector3f::ZERO;
-            std::vector<Vector3f> colors;   // 存放每次采样得到的颜色
             for(int _ = 0; _ < SAMPLING_TIMES; _++){
                 // 蒙特卡洛采样SAMPLING_TIMES次
-                Vector3f tmpColor = Vector3f::ZERO;
-                Ray currentRay = camera->generateRay(Vector2f(x, y));
+                Ray currentRay = camera->generateRay(Vector2f(x + float(rand()) / RAND_MAX - 0.5f,
+                    y + float(rand()) / RAND_MAX - 0.5f));
                 while(true){
-                    // 进行一次采样，结果储存在tmpColor中
+                    // 进行一次采样，直接加到color中
                     Hit hit;
                     bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN);
                     Vector3f normal = hit.normal.normalized();
@@ -121,11 +127,21 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         float diffuseIntensity = 1.0f - reflectIntensity - refractIntensity;
                         // 至此，折射率、反射率、折射方向和反射方向已经计算完毕
                         // 根据当前物体亮度更新tmpColor
+                        float ratio = 1.0f;
+                        if(++currentRay.depth > RR){
+                            Vector3f c = material->diffuseColor;
+                            float rgbMax = (c[0] > c[1]) ? (c[0] > c[2] ? c[0] : c[2])
+                                : (c[1] > c[2] ? c[1] : c[2]);
+                            if(float(rand()) / RAND_MAX < rgbMax && currentRay.depth <= MAX_DEPTH)
+                                ratio = 1 / rgbMax;
+                            else{
+                                color += currentRay.intensity * material->luminance * currentRay.pastColor;
+                                break;
+                            }
+                        }
                         int type = randType(reflectIntensity, refractIntensity);
-                        currentRay.pastColor += currentRay.intensity * diffuseIntensity
-                            * material->diffuseColor;
-                        tmpColor += currentRay.intensity * diffuseIntensity
-                            * material->luminance * currentRay.pastColor;
+                        color += currentRay.intensity * material->luminance * currentRay.pastColor;
+                        currentRay.pastColor = currentRay.pastColor * material->diffuseColor * ratio;  
                         // 轮盘赌确定下一次光线是反射折射还是漫反射
                         if(type == 0){
                             // 0 反射光线
@@ -135,10 +151,7 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                                 currentRay.intensity *= reflectIntensity;
                                 currentRay.isOutside = reflectIsOutside;
                             }
-                            else{
-                                // intensity过小直接舍弃，下同
-                                break;
-                            }
+                            else break;
                         }
                         else if(type == 1){
                             // 1 折射光线
@@ -155,8 +168,6 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             if(currentRay.intensity * diffuseIntensity >= MIN_INTENSITY){
                                 // 决定漫反射光线方向
                                 Vector3f diffuseDirection = randDirection(normal);
-                                // currentRay.pastColor += currentRay.intensity * diffuseIntensity
-                                //      * material->diffuseColor;
                                 currentRay.origin = origin + DELTA * diffuseDirection;
                                 currentRay.direction = diffuseDirection;
                                 currentRay.intensity *= diffuseIntensity;
@@ -167,17 +178,12 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                     }
                     else{
                         // 没有交点，返回背景色
-                        tmpColor += currentRay.intensity * sceneParser.getBackgroundColor();
+                        color += currentRay.intensity * currentRay.pastColor * sceneParser.getBackgroundColor();
                         break;
                     }
                 }
-                colors.push_back(tmpColor);
             }
-            // 计算colors的平均值
-            // std::cout << "### size: " << colors.size() << std::endl;
-            for(int i = 0; i < colors.size(); i++)
-                color += colors[i];
-            color =  color / colors.size();
+            color =  color / SAMPLING_TIMES;
             img->SetPixel(x, y, color);
         }
     }

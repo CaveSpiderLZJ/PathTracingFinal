@@ -62,7 +62,7 @@ public:
         Vector3f intersect = this->center + direction * this->dis;  // center in screen
         intersect += (point[0] - this->width / 2.0f) * this->horizontal;
         intersect += (point[1] - this->height / 2.0f) * this->up;
-        return Ray(this->center, (intersect - this->center).normalized(), Vector3f::ZERO, 1.0f, true);
+        return Ray(this->center, (intersect - this->center).normalized(), Vector3f(1, 1, 1), 1.0f, 0, true);
     }
 };
 
