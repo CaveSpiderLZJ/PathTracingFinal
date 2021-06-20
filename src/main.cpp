@@ -19,11 +19,10 @@
 
 #define MAX_DEPTH 10            // 光线跟踪最大迭代次数
 #define RR 5                    // 俄罗斯轮盘赌终结
-#define MIN_INTENSITY 0.01      // 光线跟踪最小光强
 #define TMIN 1e-3
 #define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 100     // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 20     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
@@ -38,12 +37,13 @@ int randType(const float& reflectIntensity, const float& refractIntensity){
 
 Vector3f randDirection(const Vector3f& normal){
     // 输入一个法向，返回一个在法向所指的半球上的随机单位向量
+    float theta = 2 * M_PI * rand() / RAND_MAX;
+    float r = float(rand()) / RAND_MAX;
+    float rs = sqrt(r);
+    Vector3f u = (Vector3f::cross((normal[0]) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0), normal)).normalized();
+    Vector3f v = Vector3f::cross(normal, u); 
     Vector3f res = Vector3f::ZERO;
-    do{
-        for(int i = 0; i < 3; i++)
-            res[i] = normal[i] + (float(rand()) / (RAND_MAX >> 1) - 1.0f);
-    }while(Vector3f::dot(res, normal) <= 0);
-    return res.normalized();
+    return (rs*cos(theta)*u + rs*sin(theta)*v + normal*sqrt(1-r)).normalized();
 }
 
 Vector3f clampedColor(Vector3f color){
@@ -85,9 +85,9 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
                         Vector3f foot = origin + normal * 
                             Vector3f::dot(currentRay.origin - origin, normal);
-                        Vector3f reflectDirection = (2 * foot - currentRay.origin - origin).normalized();
-                        float reflectIntensity = 0.0f;
-                        float refractIntensity = 0.0f;
+                        Vector3f reflectDirection = currentRay.direction - 2 * normal *
+                            Vector3f::dot(currentRay.direction, normal);
+                        float reflectIntensity = 0.0f, refractIntensity = 0.0f;
                         Vector3f refractDirection;
                         Material* material = hit.material;
                         Fresnel fresnel = material->fresnel;
@@ -135,50 +135,38 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             if(float(rand()) / RAND_MAX < rgbMax && currentRay.depth <= MAX_DEPTH)
                                 ratio = 1 / rgbMax;
                             else{
-                                color += currentRay.intensity * material->luminance * currentRay.pastColor;
+                                color += material->luminance * currentRay.pastColor;
                                 break;
                             }
                         }
                         int type = randType(reflectIntensity, refractIntensity);
-                        color += currentRay.intensity * material->luminance * currentRay.pastColor;
+                        color += material->luminance * currentRay.pastColor;
                         currentRay.pastColor = currentRay.pastColor * material->diffuseColor * ratio;  
                         // 轮盘赌确定下一次光线是反射折射还是漫反射
                         if(type == 0){
                             // 0 反射光线
-                            if(currentRay.intensity * reflectIntensity >= MIN_INTENSITY){
-                                currentRay.origin = origin + DELTA * reflectDirection;
-                                currentRay.direction = reflectDirection;
-                                currentRay.intensity *= reflectIntensity;
-                                currentRay.isOutside = reflectIsOutside;
-                            }
-                            else break;
+                            currentRay.origin = origin + DELTA * reflectDirection;
+                            currentRay.direction = reflectDirection;
+                            currentRay.isOutside = reflectIsOutside;
                         }
                         else if(type == 1){
                             // 1 折射光线
-                            if(currentRay.intensity * refractIntensity >= MIN_INTENSITY){
-                                currentRay.origin = origin + DELTA * refractDirection;
-                                currentRay.direction = refractDirection;
-                                currentRay.intensity *= refractIntensity;
-                                currentRay.isOutside = !reflectIsOutside;
-                            }
-                            else break;
+                            currentRay.origin = origin + DELTA * refractDirection;
+                            currentRay.direction = refractDirection;
+                            currentRay.isOutside = !reflectIsOutside;
                         }
                         else{
                             // 2 漫反射光线
-                            if(currentRay.intensity * diffuseIntensity >= MIN_INTENSITY){
-                                // 决定漫反射光线方向
-                                Vector3f diffuseDirection = randDirection(normal);
-                                currentRay.origin = origin + DELTA * diffuseDirection;
-                                currentRay.direction = diffuseDirection;
-                                currentRay.intensity *= diffuseIntensity;
-                                currentRay.isOutside = reflectIsOutside;
-                            }
-                            else break;
+                            // 决定漫反射光线方向
+                            Vector3f diffuseDirection = randDirection(normal);
+                            currentRay.origin = origin + DELTA * diffuseDirection;
+                            currentRay.direction = diffuseDirection;
+                            currentRay.isOutside = reflectIsOutside;
                         }
                     }
                     else{
                         // 没有交点，返回背景色
-                        color += currentRay.intensity * currentRay.pastColor * sceneParser.getBackgroundColor();
+                        color += currentRay.pastColor * sceneParser.getBackgroundColor();
                         break;
                     }
                 }

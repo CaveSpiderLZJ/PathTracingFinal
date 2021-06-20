@@ -4,16 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 1024
-    height 1024
-}
-
-Lights {
-    numLights 1
-    PointLight {
-        position 4 0 2
-        color 1 1 1
-    }
+    width 512
+    height 512
 }
 
 Background {
@@ -21,65 +13,28 @@ Background {
 }
 
 Materials {
-    numMaterials 9
+    numMaterials 7
     Material { 
         diffuseColor 0.9 0.88 0.85
-        specularColor 0.09 0.088 0.085
-        shininess 5
-        Fresnel {
-            fbase 0.1
-            fscale 0
-            power 1
-        }
     }
     Material {
         diffuseColor 0.7 0.3 0.3
-        specularColor 0.07 0.07 0.07
-        shininess 5
-        Fresnel {
-            fbase 0.1
-            fscale 0
-            power 1
-        }
     }
     Material {
         diffuseColor 0.3 0.3 0.7
-        specularColor 0.03 0.03 0.07
-        shininess 5
-        Fresnel {
-            fbase 0.1
-            fscale 0
-            power 1
-        }
     }
     Material {
         diffuseColor 0.95 0.95 0.95
-        shininess 30
         refractiveIndex 1.5
         Fresnel {
             fbase 0.05
             fscale 0.92
-            power 15
+            power 5
         }
     }
     Material {
         diffuseColor 1 0.84 0
         luminance 0.5 0.42 0
-        Fresnel {
-            fbase 0.1
-            fscale 0
-            power 1
-        }
-    }
-    Material {
-        diffuseColor 1 1 1
-        specularColor 0.1 0.1 0.1
-        shininess 30
-        Fresnel {
-            fbase 0.9
-            fscale 0
-            power 1
-        }
     }
     Material {
         diffuseColor 0.9 1.0 0.95
@@ -91,21 +46,11 @@ Materials {
     }
     Material {
         diffuseColor 1 1 1
-        luminance 5 5 5
+        luminance 8 8 8
         Fresnel {
             fbase 0.1
             fscale 0
             power 1
-        }
-    }
-    Material {
-        diffuseColor 1 0.8 0.1
-        refractiveIndex 1.5
-        luminance 5 4 0.5
-        Fresnel {
-            fbase 0.03
-            fscale 0.82
-            power 25
         }
     }
 }
@@ -130,32 +75,32 @@ Group {
     }
     MaterialIndex 0
     Transform {
-        Translate 9.5 -4.5 5.5
-        Scale  15.5 1.5 0.5
+        Translate 9.5 -4 5.5
+        Scale  15.5 2 0.5
         TriangleMesh {
             obj_file mesh/cube.obj
         }
     }
     MaterialIndex 0
     Transform {
-        Translate 9.5 4.5 5.5
-        Scale  15.5 1.5 0.5
+        Translate 9.5 4 5.5
+        Scale  15.5 2 0.5
         TriangleMesh {
             obj_file mesh/cube.obj
         }
     }
     MaterialIndex 0
     Transform {
-        Translate -4.5 0 5.5
-        Scale 1.5 3 0.5
+        Translate -4 0 5.5
+        Scale 2 2 0.5
         TriangleMesh {
             obj_file mesh/cube.obj
         }
     }
     MaterialIndex 0
     Transform {
-        Translate 14 0 5.5
-        Scale 11 3 0.5
+        Translate 13.5 0 5.5
+        Scale 11.5 2 0.5
         TriangleMesh {
             obj_file mesh/cube.obj
         }
@@ -183,7 +128,7 @@ Group {
             radius 2.5
         }
     }
-    MaterialIndex 6
+    MaterialIndex 5
     Transform {
         Sphere {
             center 2 2 -3
@@ -197,10 +142,10 @@ Group {
             radius 1.5
         }
     }
-    MaterialIndex 7
+    MaterialIndex 6
     Transform {
         Translate 0 0 5.5
-        Scale 3 3 0.5
+        Scale 2 2 0.5
         TriangleMesh {
             obj_file mesh/cube.obj
         }
