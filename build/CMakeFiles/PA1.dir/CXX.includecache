@@ -95,9 +95,15 @@ ray.hpp
 ../include/ray.hpp
 hit.hpp
 ../include/hit.hpp
+image.hpp
+../include/image.hpp
+stb_image.h
+../include/stb_image.h
 iostream
 -
 cmath
+-
+cstring
 -
 
 ../include/mesh.hpp
@@ -150,6 +156,38 @@ object3d.hpp
 vecmath.h
 -
 cmath
+-
+
+../include/stb_image.h
+stb_image.h
+../include/stb_image.h
+stdio.h
+-
+stdlib.h
+-
+stdarg.h
+-
+stddef.h
+-
+stdlib.h
+-
+string.h
+-
+limits.h
+-
+math.h
+-
+stdio.h
+-
+assert.h
+-
+stdint.h
+-
+emmintrin.h
+-
+intrin.h
+-
+arm_neon.h
 -
 
 ../include/transform.hpp
@@ -215,6 +253,12 @@ queue
 -
 omp.h
 /mnt/d/vsc/CG/Final/code/src/omp.h
+
+/mnt/d/vsc/CG/Final/code/src/material.cpp
+material.hpp
+/mnt/d/vsc/CG/Final/code/src/material.hpp
+stb_image.h
+/mnt/d/vsc/CG/Final/code/src/stb_image.h
 
 /mnt/d/vsc/CG/Final/code/src/mesh.cpp
 mesh.hpp

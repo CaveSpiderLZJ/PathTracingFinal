@@ -32,11 +32,11 @@ public:
     ~Transform() {
     }
 
-    virtual bool intersect(const Ray &ray, Hit &hit, float tmin) {
+    virtual bool intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
         Vector3f trSource = transformPoint(transform, ray.getOrigin());
         Vector3f trDirection = transformDirection(transform, ray.getDirection());
         Ray tr(trSource, trDirection.normalized());
-        bool isIntersected = obj->intersect(tr, hit, tmin);
+        bool isIntersected = obj->intersect(tr, hit, tmin, u, v);
         if(!isIntersected) return false;
         Vector3f transformedN = transformDirection(transform.transposed(), hit.getNormal());
         hit.set(hit.getT() / trDirection.length(), hit.getMaterial(), transformedN);

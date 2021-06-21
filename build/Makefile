@@ -209,6 +209,33 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/PA1.dir/build.make CMakeFiles/PA1.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/material.o: src/material.cpp.o
+
+.PHONY : src/material.o
+
+# target to build an object file
+src/material.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PA1.dir/build.make CMakeFiles/PA1.dir/src/material.cpp.o
+.PHONY : src/material.cpp.o
+
+src/material.i: src/material.cpp.i
+
+.PHONY : src/material.i
+
+# target to preprocess a source file
+src/material.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PA1.dir/build.make CMakeFiles/PA1.dir/src/material.cpp.i
+.PHONY : src/material.cpp.i
+
+src/material.s: src/material.cpp.s
+
+.PHONY : src/material.s
+
+# target to generate assembly for a file
+src/material.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/PA1.dir/build.make CMakeFiles/PA1.dir/src/material.cpp.s
+.PHONY : src/material.cpp.s
+
 src/mesh.o: src/mesh.cpp.o
 
 .PHONY : src/mesh.o
@@ -279,6 +306,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/material.o"
+	@echo "... src/material.i"
+	@echo "... src/material.s"
 	@echo "... src/mesh.o"
 	@echo "... src/mesh.i"
 	@echo "... src/mesh.s"

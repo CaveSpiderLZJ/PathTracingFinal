@@ -32,7 +32,7 @@ public:
 
     ~Plane() override = default;
 
-    bool intersect(const Ray &ray, Hit &hit, float tmin) override {
+    bool intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) override {
         float dotND = Vector3f::dot(normal, ray.getDirection().normalized());
         if( dotND == 0){
             return false;

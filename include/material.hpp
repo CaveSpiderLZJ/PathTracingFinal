@@ -6,8 +6,13 @@
 
 #include "ray.hpp"
 #include "hit.hpp"
+#include "image.hpp"
+
+#include "stb_image.h"
+
 #include <iostream>
 #include <cmath>
+#include <cstring>
 
 class Fresnel{
 public:
@@ -15,10 +20,9 @@ public:
     float fscale;
     float power;
 
-    Fresnel(): fbase(0.0f), fscale(0.0f), power(1.0f) {}
+    Fresnel();
 
-    Fresnel(const float& _fbase, const float& _fscale, const float& _power):
-        fbase(_fbase), fscale(_fscale), power(_power) {}
+    Fresnel(const float& _fbase, const float& _fscale, const float& _power);
 };
 
 // TODO: Implement Shade function that computes Phong introduced in class.
@@ -32,33 +36,21 @@ public:
     float shininess;
     float refractiveIndex;
     Fresnel fresnel;
+    unsigned char* texture;
+    int w, h, n;
 
     Material() = delete;
 
     explicit Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor = Vector3f::ZERO,
-        const Vector3f& _luminance = Vector3f::ZERO, float _shininess = 0, float _refractiveIndex = 1.0f, Fresnel _fresnel = Fresnel()):
-        diffuseColor(_diffuseColor), specularColor(_specularColor), luminance(_luminance),
-        shininess(_shininess), refractiveIndex(_refractiveIndex), fresnel(_fresnel) {}
+        const Vector3f& _luminance = Vector3f::ZERO, float _shininess = 0, float _refractiveIndex = 1.0f,
+        Fresnel _fresnel = Fresnel(), const char* filePath = "\0");
 
     virtual ~Material() = default;
 
-    virtual Vector3f getDiffuseColor() const {
-        return diffuseColor;
-    }
+    virtual Vector3f getDiffuseColor(float u = 0.0f, float v = 0.0f) const;
 
     Vector3f Shade(const Ray &ray, const Hit &hit,
-        const Vector3f &dirToLight, const Vector3f &lightColor){
-        Vector3f shaded = Vector3f::ZERO;
-        Vector3f dir = -1 * dirToLight.normalized();
-        Vector3f normal = hit.getNormal().normalized();
-        Vector3f reflect = dir - 2 * Vector3f::dot(dir, normal) * normal;
-        shaded += Vector3f::dot(dirToLight.normalized(), normal) * lightColor * diffuseColor;
-        float dotRV = Vector3f::dot(reflect, -1 * ray.getDirection().normalized());
-        if(dotRV > 0){
-            shaded += lightColor * specularColor * pow(dotRV, shininess);
-        }
-        return shaded;
-    }
+        const Vector3f &dirToLight, const Vector3f &lightColor);
 };
 
 #endif // MATERIAL_H

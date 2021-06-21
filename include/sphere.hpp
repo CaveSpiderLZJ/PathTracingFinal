@@ -30,7 +30,7 @@ public:
 
     ~Sphere() override = default;
 
-    bool intersect(const Ray &ray, Hit &hit, float tmin) override {
+    bool intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) override {
         // check if camera is in the sphere
         bool isAhead;
         float disCenter2Ray = disPoint2Ray(center, ray, isAhead);
@@ -59,6 +59,10 @@ public:
             intersect = ray.getOrigin() + t * ray.getDirection().normalized();
             normal = (center - intersect).normalized(); 
         }
+        Vector3f dir = intersect - center;
+        if(dir[0] > 0.0f) u = 0.25f + atan(intersect[1] / intersect[0]) / (2 * M_PI);
+        else u = 0.75f + atan(intersect[1] / intersect[0]) / (2 * M_PI);
+        v = 0.5f - atan(intersect[2] / sqrt(intersect[0] * intersect[0] + intersect[1] * intersect[1])) / M_PI;
         hit.set(t, material, normal);
         return true;
     }

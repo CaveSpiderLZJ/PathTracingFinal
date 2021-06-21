@@ -22,7 +22,7 @@
 #define TMIN 1e-3
 #define DELTA 1e-5
 #define PROGRESS_NUM 10         // 画图时进度信息数目 
-#define SAMPLING_TIMES 10     // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 200     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
@@ -79,9 +79,12 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                 while(true){
                     // 进行一次采样，直接加到color中
                     Hit hit;
-                    bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN);
+                    float u = 0.0f, v = 0.0f;
+                    bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN, u, v);
                     Vector3f normal = hit.normal.normalized();
                     if(isIntersect){
+                        //std::cout << "### u: " << u << " v: " << v << std::endl;
+
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
                         Vector3f foot = origin + normal * 
                             Vector3f::dot(currentRay.origin - origin, normal);
@@ -129,7 +132,7 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         // 根据当前物体亮度更新tmpColor
                         float ratio = 1.0f;
                         if(++currentRay.depth > RR){
-                            Vector3f c = material->diffuseColor;
+                            Vector3f c = material->getDiffuseColor(u, v);
                             float rgbMax = (c[0] > c[1]) ? (c[0] > c[2] ? c[0] : c[2])
                                 : (c[1] > c[2] ? c[1] : c[2]);
                             if(float(rand()) / RAND_MAX < rgbMax && currentRay.depth <= MAX_DEPTH)
@@ -141,7 +144,7 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         }
                         int type = randType(reflectIntensity, refractIntensity);
                         color += material->luminance * currentRay.pastColor;
-                        currentRay.pastColor = currentRay.pastColor * material->diffuseColor * ratio;  
+                        currentRay.pastColor = currentRay.pastColor * material->getDiffuseColor(u, v) * ratio;  
                         // 轮盘赌确定下一次光线是反射折射还是漫反射
                         if(type == 0){
                             // 0 反射光线
