@@ -22,7 +22,7 @@
 #define TMIN 1e-3
 #define DELTA 1e-5
 #define PROGRESS_NUM 10         // 画图时进度信息数目 
-#define SAMPLING_TIMES 200     // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 2000     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
