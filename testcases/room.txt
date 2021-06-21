@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 512
-    height 512
+    width 1024
+    height 1024
 }
 
 Background {
@@ -29,7 +29,7 @@ Materials {
         Fresnel {
             fbase 0.05
             fscale 0.92
-            power 5
+            power 10
         }
     }
     Material {
