@@ -35,13 +35,13 @@ public:
 
     }
 
-    bool intersect(const Ray &ray, Hit &hit, float tmin) override {
+    bool intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) override {
         float t = 1e38;
         Vector3f n;
         Material* m = nullptr;
         bool isIntersected = false;
         for(Object3D* object : objects){
-            if(object->intersect(ray, hit, tmin) && hit.getT() < t){
+            if(object->intersect(ray, hit, tmin, u, v) && hit.getT() < t){
                 isIntersected = true;
                 t = hit.getT();
                 n = hit.getNormal().normalized();

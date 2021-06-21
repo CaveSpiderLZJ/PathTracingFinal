@@ -11,7 +11,8 @@ SET(PA1_SOURCES
         src/image.cpp
         src/main.cpp
         src/mesh.cpp
-        src/scene_parser.cpp)
+        src/scene_parser.cpp
+        src/material.cpp)
 
 SET(PA1_INCLUDES
         include/camera.hpp

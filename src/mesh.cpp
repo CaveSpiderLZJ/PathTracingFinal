@@ -9,7 +9,7 @@
 
 #define MIN_TRIANGLE 12      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
 
-bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
+bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     // 记录所有三角形是否已经求过交，防止重复求交浪费算力
     for(int i = 0; i < triangles.size(); i++){
         hasIntersected[i] = false;
@@ -58,7 +58,7 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin) {
         TriangleIndex& triIndex = triangles[candidates[i]];
         Triangle triangle(vertices[triIndex[0]],
                           vertices[triIndex[1]], vertices[triIndex[2]], material);
-        if(triangle.intersect(ray, hit, tmin) && hit.getT() < t){
+        if(triangle.intersect(ray, hit, tmin, u, v) && hit.getT() < t){
             isIntersected = true;
             t = hit.getT();
             n = hit.getNormal();

@@ -27,7 +27,7 @@ public:
         return;
 	}
 
-	bool intersect(const Ray& ray, Hit& hit, float tmin) override {
+	bool intersect(const Ray& ray, Hit& hit, float tmin, float& u, float& v) override {
         Vector3f E1 = vertices[0] - vertices[1];
         Vector3f E2 = vertices[0] - vertices[2];
         Vector3f S = vertices[0] - ray.getOrigin();

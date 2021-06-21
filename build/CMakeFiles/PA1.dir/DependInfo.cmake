@@ -6,6 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/mnt/d/vsc/CG/Final/code/src/image.cpp" "/mnt/d/vsc/CG/Final/code/build/CMakeFiles/PA1.dir/src/image.cpp.o"
   "/mnt/d/vsc/CG/Final/code/src/main.cpp" "/mnt/d/vsc/CG/Final/code/build/CMakeFiles/PA1.dir/src/main.cpp.o"
+  "/mnt/d/vsc/CG/Final/code/src/material.cpp" "/mnt/d/vsc/CG/Final/code/build/CMakeFiles/PA1.dir/src/material.cpp.o"
   "/mnt/d/vsc/CG/Final/code/src/mesh.cpp" "/mnt/d/vsc/CG/Final/code/build/CMakeFiles/PA1.dir/src/mesh.cpp.o"
   "/mnt/d/vsc/CG/Final/code/src/scene_parser.cpp" "/mnt/d/vsc/CG/Final/code/build/CMakeFiles/PA1.dir/src/scene_parser.cpp.o"
   )

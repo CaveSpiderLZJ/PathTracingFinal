@@ -28,7 +28,7 @@ public:
     }
 
     // Intersect Ray with this object. If hit, store information in hit structure.
-    virtual bool intersect(const Ray &r, Hit &h, float tmin) = 0;
+    virtual bool intersect(const Ray &r, Hit &h, float tmin, float& u, float& v) = 0;
 
     // static method
     static float disPoint2Point(const Vector3f& point1, const Vector3f& point2){

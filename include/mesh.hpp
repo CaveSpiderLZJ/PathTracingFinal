@@ -96,7 +96,7 @@ public:
     BSPNode* root;
     bool* hasIntersected;
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override;
+    bool intersect(const Ray &r, Hit &h, float tmin, float& u, float& v) override;
     Mesh(const char *filename, Material *m);
     ~Mesh();
 

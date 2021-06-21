@@ -30,7 +30,23 @@ CMakeFiles/PA1.dir/src/main.cpp.o
  ../include/object3d.hpp
  ../include/ray.hpp
  ../include/scene_parser.hpp
+ ../include/stb_image.h
  /mnt/d/vsc/CG/Final/code/src/main.cpp
+CMakeFiles/PA1.dir/src/material.cpp.o
+ ../deps/vecmath/include/Matrix2f.h
+ ../deps/vecmath/include/Matrix3f.h
+ ../deps/vecmath/include/Matrix4f.h
+ ../deps/vecmath/include/Quat4f.h
+ ../deps/vecmath/include/Vector2f.h
+ ../deps/vecmath/include/Vector3f.h
+ ../deps/vecmath/include/Vector4f.h
+ ../deps/vecmath/include/vecmath.h
+ ../include/hit.hpp
+ ../include/image.hpp
+ ../include/material.hpp
+ ../include/ray.hpp
+ ../include/stb_image.h
+ /mnt/d/vsc/CG/Final/code/src/material.cpp
 CMakeFiles/PA1.dir/src/mesh.cpp.o
  ../deps/vecmath/include/Matrix2f.h
  ../deps/vecmath/include/Matrix3f.h
@@ -41,11 +57,13 @@ CMakeFiles/PA1.dir/src/mesh.cpp.o
  ../deps/vecmath/include/Vector4f.h
  ../deps/vecmath/include/vecmath.h
  ../include/hit.hpp
+ ../include/image.hpp
  ../include/material.hpp
  ../include/mesh.hpp
  ../include/object3d.hpp
  ../include/plane.hpp
  ../include/ray.hpp
+ ../include/stb_image.h
  ../include/triangle.hpp
  /mnt/d/vsc/CG/Final/code/src/mesh.cpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o
@@ -60,6 +78,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o
  ../include/camera.hpp
  ../include/group.hpp
  ../include/hit.hpp
+ ../include/image.hpp
  ../include/light.hpp
  ../include/material.hpp
  ../include/mesh.hpp
@@ -68,6 +87,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o
  ../include/ray.hpp
  ../include/scene_parser.hpp
  ../include/sphere.hpp
+ ../include/stb_image.h
  ../include/transform.hpp
  ../include/triangle.hpp
  /mnt/d/vsc/CG/Final/code/src/scene_parser.cpp
