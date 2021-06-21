@@ -13,19 +13,19 @@ public:
 
     Vector3f origin;
     Vector3f direction;
-    Vector3f pastColor;     // 记录光线之前叠加的颜色
-    float intensity;
+    Vector3f pastColor;     // 记录光线之前叠乘的颜色
+    int depth;
     bool isOutside;
 
     Ray() = delete;
 
     Ray(const Vector3f& _origin, const Vector3f& _direction,
-        const Vector3f& _pastColor = Vector3f::ZERO,
-        const float& _intensity = 1.0f, bool _isOutside = true) {
+        const Vector3f& _pastColor = Vector3f(1, 1, 1),
+        int _depth = 0, bool _isOutside = true) {
         origin = _origin;
         direction = _direction.normalized();
         pastColor = _pastColor;
-        intensity = _intensity;
+        depth = _depth;
         isOutside = _isOutside;
     }
 
@@ -33,7 +33,6 @@ public:
         origin = ray.origin;
         direction = ray.direction.normalized();
         pastColor = ray.pastColor;
-        intensity = ray.intensity;
         isOutside = ray.isOutside;
     }
 
@@ -55,15 +54,6 @@ public:
         return;
     }
 
-    const float& getIntensity() const {
-        return intensity;
-    }
-
-    void setIntensity(const float& _intensity){
-        intensity = _intensity;
-        return;
-    }
-
     Vector3f pointAtParameter(float t) const {
         return origin + direction * t;
     }
@@ -71,7 +61,7 @@ public:
 
 inline std::ostream &operator<<(std::ostream &os, const Ray &ray) {
     os << "Ray <" << ray.getOrigin() << ", " << ray.getDirection()
-        << ", " << ray.getIntensity() << ", " << ray.isOutside << ">";
+        << ", " << ray.isOutside << ">";
     return os;
 }
 

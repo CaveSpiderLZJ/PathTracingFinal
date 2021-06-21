@@ -17,12 +17,12 @@
 #include <queue>
 #include "omp.h"
 
-#define MAX_ITER 16             // 光线跟踪最大迭代次数
-#define MIN_INTENSITY 0.01      // 光线跟踪最小光强
-#define TMIN 0.0001
-#define DELTA 0.001
-#define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 500       // 蒙特卡洛光线追踪采样率
+#define MAX_DEPTH 8            // 光线跟踪最大迭代次数
+#define RR 4                    // 俄罗斯轮盘赌终结
+#define TMIN 1e-3
+#define DELTA 1e-5
+#define PROGRESS_NUM 10         // 画图时进度信息数目 
+#define SAMPLING_TIMES 10     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
@@ -37,12 +37,19 @@ int randType(const float& reflectIntensity, const float& refractIntensity){
 
 Vector3f randDirection(const Vector3f& normal){
     // 输入一个法向，返回一个在法向所指的半球上的随机单位向量
+    float theta = 2 * M_PI * rand() / RAND_MAX;
+    float r = float(rand()) / RAND_MAX;
+    float rs = sqrt(r);
+    Vector3f u = (Vector3f::cross((normal[0]) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0), normal)).normalized();
+    Vector3f v = Vector3f::cross(normal, u); 
     Vector3f res = Vector3f::ZERO;
-    do{
-        for(int i = 0; i < 3; i++)
-            res[i] = float(rand()) / (RAND_MAX >> 1) - 1.0f;
-    }while(Vector3f::dot(res, normal) <= 0);
-    return res.normalized();
+    return (rs*cos(theta)*u + rs*sin(theta)*v + normal*sqrt(1-r)).normalized();
+}
+
+Vector3f clampedColor(Vector3f color){
+    for(int i = 0; i < 3; i++)
+        color[i] = color[i] < 0 ? 0 : (color[i] > 1 ? 1 : color[i]);
+    return color;
 }
 
 void mcRayTracing(std::string inputFile, Image* img, int threadID){
@@ -65,13 +72,12 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
         }
         for(int y = 0; y < camera->getHeight(); y++){
             Vector3f color = Vector3f::ZERO;
-            std::vector<Vector3f> colors;   // 存放每次采样得到的颜色
             for(int _ = 0; _ < SAMPLING_TIMES; _++){
                 // 蒙特卡洛采样SAMPLING_TIMES次
-                Vector3f tmpColor = Vector3f::ZERO;
-                Ray currentRay = camera->generateRay(Vector2f(x, y));
+                Ray currentRay = camera->generateRay(Vector2f(x + float(rand()) / RAND_MAX - 0.5f,
+                    y + float(rand()) / RAND_MAX - 0.5f));
                 while(true){
-                    // 进行一次采样，结果储存在tmpColor中
+                    // 进行一次采样，直接加到color中
                     Hit hit;
                     bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN);
                     Vector3f normal = hit.normal.normalized();
@@ -79,9 +85,9 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
                         Vector3f foot = origin + normal * 
                             Vector3f::dot(currentRay.origin - origin, normal);
-                        Vector3f reflectDirection = (2 * foot - currentRay.origin - origin).normalized();
-                        float reflectIntensity = 0.0f;
-                        float refractIntensity = 0.0f;
+                        Vector3f reflectDirection = currentRay.direction - 2 * normal *
+                            Vector3f::dot(currentRay.direction, normal);
+                        float reflectIntensity = 0.0f, refractIntensity = 0.0f;
                         Vector3f refractDirection;
                         Material* material = hit.material;
                         Fresnel fresnel = material->fresnel;
@@ -121,63 +127,51 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         float diffuseIntensity = 1.0f - reflectIntensity - refractIntensity;
                         // 至此，折射率、反射率、折射方向和反射方向已经计算完毕
                         // 根据当前物体亮度更新tmpColor
-                        int type = randType(reflectIntensity, refractIntensity);
-                        currentRay.pastColor += currentRay.intensity * diffuseIntensity
-                            * material->diffuseColor;
-                        tmpColor += currentRay.intensity * diffuseIntensity
-                            * material->luminance * currentRay.pastColor;
-                        // 轮盘赌确定下一次光线是反射折射还是漫反射
-                        if(type == 0){
-                            // 0 反射光线
-                            if(currentRay.intensity * reflectIntensity >= MIN_INTENSITY){
-                                currentRay.origin = origin + DELTA * reflectDirection;
-                                currentRay.direction = reflectDirection;
-                                currentRay.intensity *= reflectIntensity;
-                                currentRay.isOutside = reflectIsOutside;
-                            }
+                        float ratio = 1.0f;
+                        if(++currentRay.depth > RR){
+                            Vector3f c = material->diffuseColor;
+                            float rgbMax = (c[0] > c[1]) ? (c[0] > c[2] ? c[0] : c[2])
+                                : (c[1] > c[2] ? c[1] : c[2]);
+                            if(float(rand()) / RAND_MAX < rgbMax && currentRay.depth <= MAX_DEPTH)
+                                ratio = 1 / rgbMax;
                             else{
-                                // intensity过小直接舍弃，下同
+                                color += material->luminance * currentRay.pastColor;
                                 break;
                             }
                         }
+                        int type = randType(reflectIntensity, refractIntensity);
+                        color += material->luminance * currentRay.pastColor;
+                        currentRay.pastColor = currentRay.pastColor * material->diffuseColor * ratio;  
+                        // 轮盘赌确定下一次光线是反射折射还是漫反射
+                        if(type == 0){
+                            // 0 反射光线
+                            currentRay.origin = origin + DELTA * reflectDirection;
+                            currentRay.direction = reflectDirection;
+                            currentRay.isOutside = reflectIsOutside;
+                        }
                         else if(type == 1){
                             // 1 折射光线
-                            if(currentRay.intensity * refractIntensity >= MIN_INTENSITY){
-                                currentRay.origin = origin + DELTA * refractDirection;
-                                currentRay.direction = refractDirection;
-                                currentRay.intensity *= refractIntensity;
-                                currentRay.isOutside = !reflectIsOutside;
-                            }
-                            else break;
+                            currentRay.origin = origin + DELTA * refractDirection;
+                            currentRay.direction = refractDirection;
+                            currentRay.isOutside = !reflectIsOutside;
                         }
                         else{
                             // 2 漫反射光线
-                            if(currentRay.intensity * diffuseIntensity >= MIN_INTENSITY){
-                                // 决定漫反射光线方向
-                                Vector3f diffuseDirection = randDirection(normal);
-                                // currentRay.pastColor += currentRay.intensity * diffuseIntensity
-                                //      * material->diffuseColor;
-                                currentRay.origin = origin + DELTA * diffuseDirection;
-                                currentRay.direction = diffuseDirection;
-                                currentRay.intensity *= diffuseIntensity;
-                                currentRay.isOutside = reflectIsOutside;
-                            }
-                            else break;
+                            // 决定漫反射光线方向
+                            Vector3f diffuseDirection = randDirection(normal);
+                            currentRay.origin = origin + DELTA * diffuseDirection;
+                            currentRay.direction = diffuseDirection;
+                            currentRay.isOutside = reflectIsOutside;
                         }
                     }
                     else{
                         // 没有交点，返回背景色
-                        tmpColor += currentRay.intensity * sceneParser.getBackgroundColor();
+                        color += currentRay.pastColor * sceneParser.getBackgroundColor();
                         break;
                     }
                 }
-                colors.push_back(tmpColor);
             }
-            // 计算colors的平均值
-            // std::cout << "### size: " << colors.size() << std::endl;
-            for(int i = 0; i < colors.size(); i++)
-                color += colors[i];
-            color =  color / colors.size();
+            color =  color / SAMPLING_TIMES;
             img->SetPixel(x, y, color);
         }
     }

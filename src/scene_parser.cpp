@@ -47,10 +47,6 @@ SceneParser::SceneParser(const char *filename) {
     parseFile();
     fclose(file);
     file = nullptr;
-
-    if (num_lights == 0) {
-        printf("WARNING:    No lights specified\n");
-    }
 }
 
 SceneParser::~SceneParser() {
