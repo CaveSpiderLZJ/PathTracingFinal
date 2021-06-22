@@ -31,7 +31,7 @@ public:
     }
 
     // Generate rays for each screen-space coordinate
-    virtual Ray generateRay(const Vector2f &point) = 0;
+    virtual Ray generateRay(const Vector2f &point, unsigned short* seed) = 0;
     virtual ~Camera() = default;
 
     int getWidth() const { return width; }
@@ -63,22 +63,22 @@ public:
         dis = (width / 2.0f) / tan(angle / 2.0f);
     }
 
-    Vector3f randDelta(){
+    Vector3f randDelta(unsigned short* seed){
         // return a random delta based on field
-        float theta = 2 * M_PI * rand() / RAND_MAX;
-        float r = float(rand()) / RAND_MAX;
+        float theta = 2 * M_PI * erand48(seed);
+        float r = erand48(seed);
         float rs = sqrt(r);
         float dir = 1.0f;
-        if(float(rand()) / RAND_MAX < 0.5f) dir = -1.0f;
+        if(erand48(seed) < 0.5f) dir = -1.0f;
         return (rs*cos(theta)*Vector3f::UP + rs*sin(theta)*Vector3f::RIGHT
             + dir*sqrt(1-r)*Vector3f::FORWARD) * field;
     }
 
-    Ray generateRay(const Vector2f &point) override {
+    Ray generateRay(const Vector2f &point, unsigned short* seed) override {
         Vector3f intersect = center + direction * focus;  // center in screen
         intersect += (point[0] - width / 2.0f) * (focus / dis) * horizontal;
         intersect += (point[1] - height / 2.0f) * (focus / dis) * up;
-        Vector3f start = center + randDelta();
+        Vector3f start = center + randDelta(seed);
         return Ray(start, (intersect - start).normalized(), Vector3f(1, 1, 1), 0, true);
     }
 };

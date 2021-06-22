@@ -46,7 +46,7 @@ Materials {
     }
     Material {
         diffuseColor 1 1 1
-        luminance 12 12 12
+        luminance 10 10 10
     }
     Material {
         diffuseColor 0.95 0.95 0.95
