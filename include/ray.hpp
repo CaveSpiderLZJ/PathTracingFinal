@@ -15,25 +15,22 @@ public:
     Vector3f direction;
     Vector3f pastColor;     // 记录光线之前叠乘的颜色
     int depth;
-    bool isOutside;
 
     Ray() = delete;
 
     Ray(const Vector3f& _origin, const Vector3f& _direction,
         const Vector3f& _pastColor = Vector3f(1, 1, 1),
-        int _depth = 0, bool _isOutside = true) {
+        int _depth = 0) {
         origin = _origin;
         direction = _direction.normalized();
         pastColor = _pastColor;
         depth = _depth;
-        isOutside = _isOutside;
     }
 
     Ray(const Ray &ray) {
         origin = ray.origin;
         direction = ray.direction.normalized();
         pastColor = ray.pastColor;
-        isOutside = ray.isOutside;
     }
 
     const Vector3f &getOrigin() const {
@@ -61,7 +58,7 @@ public:
 
 inline std::ostream &operator<<(std::ostream &os, const Ray &ray) {
     os << "Ray <" << ray.getOrigin() << ", " << ray.getDirection()
-        << ", " << ray.isOutside << ">";
+        << ", " << ">";
     return os;
 }
 

@@ -22,7 +22,7 @@
 #define TMIN 1e-4
 #define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 10     // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 100     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 12        // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity, unsigned short* seed){
@@ -84,6 +84,11 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                     bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN, u, v);
                     //std::cout << "### after intersect" << std::endl;
                     Vector3f normal = hit.normal.normalized();
+                    bool isOutside = true;      // 入射光线是否在物体外面
+                    if(Vector3f::dot(currentRay.direction, normal) > 0.0f){
+                        isOutside = false;
+                        normal = -normal;   // normal现在始终和入射光线反向
+                    }
                     if(isIntersect){
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
                         Vector3f foot = origin + normal * 
@@ -94,11 +99,9 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         Vector3f refractDirection;
                         Material* material = hit.material;
                         Fresnel fresnel = material->fresnel;
-                        float dotIN = -1 * Vector3f::dot(currentRay.direction.normalized(), normal);
-                        bool reflectIsOutside = true;
-                        if(currentRay.isOutside){
+                        float dotIN = -Vector3f::dot(currentRay.direction.normalized(), normal);
+                        if(isOutside){
                             //光疏到光密，正常计算
-                            reflectIsOutside = true;
                             reflectIntensity = fresnel.fbase + fresnel.fscale * pow((1.0f - dotIN), fresnel.power);
                             refractIntensity = fresnel.fbase + fresnel.fscale - reflectIntensity;
                             float sinS = sqrt(1.0f - dotIN * dotIN) / material->refractiveIndex;
@@ -108,7 +111,6 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         }
                         else{
                             // 光密到光疏，注意临界折射角
-                            reflectIsOutside = false;
                             float sinS = sqrt(1.0f - dotIN * dotIN) * material->refractiveIndex;
                             if(sinS >= 1.0f){
                                 // 到达临界角，发生全反射
@@ -150,13 +152,11 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             // 0 反射光线
                             currentRay.origin = origin + DELTA * reflectDirection;
                             currentRay.direction = reflectDirection;
-                            currentRay.isOutside = reflectIsOutside;
                         }
                         else if(type == 1){
                             // 1 折射光线
                             currentRay.origin = origin + DELTA * refractDirection;
                             currentRay.direction = refractDirection;
-                            currentRay.isOutside = !reflectIsOutside;
                         }
                         else{
                             // 2 漫反射光线
@@ -164,7 +164,6 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             Vector3f diffuseDirection = randDirection(normal, seed);
                             currentRay.origin = origin + DELTA * diffuseDirection;
                             currentRay.direction = diffuseDirection;
-                            currentRay.isOutside = reflectIsOutside;
                         }
                     }
                     else{
