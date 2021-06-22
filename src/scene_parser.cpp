@@ -123,8 +123,15 @@ void SceneParser::parsePerspectiveCamera() {
     assert (!strcmp(token, "height"));
     int height = readInt();
     getToken(token);
+    assert (!strcmp(token, "focus"));
+    float focus = readFloat();
+    getToken(token);
+    assert (!strcmp(token, "field"));
+    float field = readFloat();
+    getToken(token);
     assert (!strcmp(token, "}"));
-    camera = new PerspectiveCamera(center, direction, up, width, height, angle_radians);
+    camera = new PerspectiveCamera(center, direction, up,
+        width, height, angle_radians, focus, field);
 }
 
 void SceneParser::parseBackground() {

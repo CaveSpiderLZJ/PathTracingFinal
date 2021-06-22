@@ -17,9 +17,9 @@
 #include <queue>
 #include "omp.h"
 
-#define MAX_DEPTH 4            // 光线跟踪最大迭代次数
-#define RR 2                    // 俄罗斯轮盘赌终结
-#define TMIN 1e-3
+#define MAX_DEPTH 8            // 光线跟踪最大迭代次数
+#define RR 4                    // 俄罗斯轮盘赌终结
+#define TMIN 1e-5
 #define DELTA 1e-5
 #define PROGRESS_NUM 10         // 画图时进度信息数目 
 #define SAMPLING_TIMES 10     // 蒙特卡洛光线追踪采样率
@@ -41,8 +41,7 @@ Vector3f randDirection(const Vector3f& normal){
     float r = float(rand()) / RAND_MAX;
     float rs = sqrt(r);
     Vector3f u = (Vector3f::cross((normal[0]) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0), normal)).normalized();
-    Vector3f v = Vector3f::cross(normal, u); 
-    Vector3f res = Vector3f::ZERO;
+    Vector3f v = Vector3f::cross(normal, u);
     return (rs*cos(theta)*u + rs*sin(theta)*v + normal*sqrt(1-r)).normalized();
 }
 
