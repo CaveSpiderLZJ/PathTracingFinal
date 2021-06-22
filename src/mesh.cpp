@@ -7,7 +7,8 @@
 #include <sstream>
 #include <queue>
 
-#define MIN_TRIANGLE 12      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
+#define MIN_TRIANGLE 16      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
+#define MIN_SIZE 0.02f         // 当一个包围盒的最大边长小于这个数时，就不再扩展
 
 bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     // 记录所有三角形是否已经求过交，防止重复求交浪费算力
@@ -63,6 +64,7 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
             t = hit.getT();
             n = hit.getNormal();
             m = hit.getMaterial();
+            interIdx = triIndex;
         }
     }
     if(!isIntersected) return false;
@@ -133,6 +135,35 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
     hasIntersected = new bool[triangles.size()];
 }
 
+Mesh::Mesh(const std::vector<Vector3f>& v, Material* mat, int m, int n){
+    // 旋转曲面的离散点阵列，m行，n列，每行是一条曲线
+    // 保证第一列和最后一列分别是同一个点
+    // 构建离散的三角形面片
+    material = mat;
+    vertices = v;
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n - 1; j++){
+            int delta = (i < m-1) ? 0 : m*n;
+            if(j != n-2){
+                TriangleIndex tri1;
+                tri1[0] = i * n + j;
+                tri1[2] = tri1[0] + 1;
+                tri1[1] = tri1[2] + n - delta;
+                triangles.push_back(tri1);
+            }
+            if(j != 0){
+                TriangleIndex tri2;
+                tri2[0] = i * n + j;
+                tri2[1] = tri2[0] + n - delta;
+                tri2[2] = tri2[1] + 1;
+                triangles.push_back(tri2);
+            }
+        }
+    }
+    initBSP();
+    hasIntersected = new bool[triangles.size()];
+}
+
 Mesh::~Mesh(){
     delete[] hasIntersected;
     std::vector<BSPNode*> nodes;
@@ -182,10 +213,16 @@ void Mesh::initBSP(){
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();
         computeTriangle(currentNode);
-        if(currentNode->triangleIdx.size() > MIN_TRIANGLE){
-            // 当前节点的三角形超过了下限，继续扩展
+        float maxSize = 0.0f;
+        currentNode->getBounding(minPos, maxPos);
+        for(int i = 0; i < 3; i++){
+            maxPos[i] - minPos[i] > maxSize;
+            maxSize = maxPos[i] - minPos[i];
+        }
+        // std::cout << "### maxSize: " << maxSize << std::endl;
+        if(currentNode->triangleIdx.size() > MIN_TRIANGLE && maxSize > MIN_SIZE){
+            // 当前节点的三角形数量且包围盒大小超过了下限，继续扩展
             int nextPartition = currentNode->nextPartition;
-            currentNode->getBounding(minPos, maxPos);
             float mean = (minPos[nextPartition] + maxPos[nextPartition]) / 2.0f;
             float tmpMax = maxPos[nextPartition];
             maxPos[nextPartition] = mean;

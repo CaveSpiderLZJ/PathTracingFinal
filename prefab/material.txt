@@ -46,3 +46,24 @@ Material {
         power 1
     }
 }
+
+MaterialIndex 3
+    RevSurface {
+        profile BezierCurve {
+            controls
+                [ 0 3 0 ]
+                [ 2 1 0 ]
+                [ 2 -1 0 ]
+                [ 0 -3 0 ]
+        }
+    }
+
+MaterialIndex 3
+    Transform {
+        Scale 3.5 3.5 3.5
+        XRotate 90
+        YRotate 90
+        TriangleMesh {
+            obj_file mesh/dragon_100k.obj
+        }
+    }

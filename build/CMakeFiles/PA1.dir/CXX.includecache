@@ -56,6 +56,22 @@ float.h
 cmath
 -
 
+../include/curve.hpp
+object3d.hpp
+../include/object3d.hpp
+vecmath.h
+-
+vector
+-
+utility
+-
+iostream
+-
+algorithm
+-
+cmath
+-
+
 ../include/group.hpp
 object3d.hpp
 ../include/object3d.hpp
@@ -142,6 +158,16 @@ cassert
 iostream
 -
 Vector3f.h
+-
+
+../include/revsurface.hpp
+object3d.hpp
+../include/object3d.hpp
+curve.hpp
+../include/curve.hpp
+mesh.hpp
+../include/mesh.hpp
+tuple
 -
 
 ../include/scene_parser.hpp
@@ -309,4 +335,8 @@ triangle.hpp
 /mnt/d/vsc/CG/Final/code/src/triangle.hpp
 transform.hpp
 /mnt/d/vsc/CG/Final/code/src/transform.hpp
+curve.hpp
+/mnt/d/vsc/CG/Final/code/src/curve.hpp
+revsurface.hpp
+/mnt/d/vsc/CG/Final/code/src/revsurface.hpp
 

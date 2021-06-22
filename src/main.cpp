@@ -17,12 +17,12 @@
 #include <queue>
 #include "omp.h"
 
-#define MAX_DEPTH 8            // 光线跟踪最大迭代次数
-#define RR 4                    // 俄罗斯轮盘赌终结
+#define MAX_DEPTH 4            // 光线跟踪最大迭代次数
+#define RR 2                    // 俄罗斯轮盘赌终结
 #define TMIN 1e-3
 #define DELTA 1e-5
 #define PROGRESS_NUM 10         // 画图时进度信息数目 
-#define SAMPLING_TIMES 2000     // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 10     // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 10           // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity){
@@ -80,11 +80,11 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                     // 进行一次采样，直接加到color中
                     Hit hit;
                     float u = 0.0f, v = 0.0f;
+                    //std::cout << "### before intersect" << std::endl;
                     bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN, u, v);
+                    //std::cout << "### after intersect" << std::endl;
                     Vector3f normal = hit.normal.normalized();
                     if(isIntersect){
-                        //std::cout << "### u: " << u << " v: " << v << std::endl;
-
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
                         Vector3f foot = origin + normal * 
                             Vector3f::dot(currentRay.origin - origin, normal);

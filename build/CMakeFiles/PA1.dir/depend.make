@@ -75,6 +75,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../deps/vecmath/include/Vector3f.h
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../deps/vecmath/include/Vector4f.h
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../deps/vecmath/include/vecmath.h
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/camera.hpp
+CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/curve.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/group.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/hit.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/image.hpp
@@ -84,6 +85,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/mesh.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/object3d.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/plane.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/ray.hpp
+CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/revsurface.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/scene_parser.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/sphere.hpp
 CMakeFiles/PA1.dir/src/scene_parser.cpp.o: ../include/stb_image.h
