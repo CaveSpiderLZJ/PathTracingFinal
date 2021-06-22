@@ -30,11 +30,11 @@ public:
         std::vector<Vector3f> v;
         for(int i = 0; i < THETA_RES; i++){
             Quat4f rot;
-            rot.setAxisAngle(-float(i) / THETA_RES * 2 * M_PI, Vector3f::UP);
+            rot.setAxisAngle(-float(i) / THETA_RES * 6.2831852f, Vector3f::UP);
             for(int j = 0; j < data.size(); j++)
                 v.push_back(Matrix3f::rotation(rot) * data[j].V);
         }
-        m = THETA_RES;
+        m = v.size() / data.size();
         n = data.size();
         mesh = new Mesh(v, material, m, n);
     }

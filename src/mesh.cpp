@@ -143,7 +143,7 @@ Mesh::Mesh(const std::vector<Vector3f>& v, Material* mat, int m, int n){
     vertices = v;
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n - 1; j++){
-            int delta = (i < m-1) ? 0 : (m*n);
+            int delta = (i < m-1) ? 0 : m*n;
             if(j != n-2){
                 TriangleIndex tri1;
                 // tri1[0] = i * n + j;

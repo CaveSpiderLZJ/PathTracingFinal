@@ -54,35 +54,34 @@ Materials {
 Group {
     numObjects 7
     MaterialIndex 0
-    MaterialIndex 0
-    Plane {
-	    normal 1 0 0
-        offset -5
+    Sphere {
+        center -100005 0 0
+        radius 100000
     }
     MaterialIndex 1
-    Plane {
-	    normal 0 1 0
-        offset -5
+    Sphere {
+        center 0 -100005 0
+        radius 100000
     }
     MaterialIndex 2
-    Plane {
-	    normal 0 -1 0
-        offset -5
+    Sphere {
+        center 0 100005 0
+        radius 100000
     }
     MaterialIndex 0
-    Plane {
-	    normal 0 0 1
-        offset -5
+    Sphere {
+        center 0 0 -100005
+        radius 100000
     }
     MaterialIndex 0
-    Plane {
-	    normal 0 0 -1
-        offset -5
+    Sphere {
+        center 0 0 100005
+        radius 100000
     }
     MaterialIndex 4
     Sphere {
-        center 0 0 604.995
-        radius 600
+        center 0 0 5
+        radius 2
     }
     MaterialIndex 5
     Transform {
