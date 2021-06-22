@@ -76,6 +76,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o
  ../deps/vecmath/include/Vector4f.h
  ../deps/vecmath/include/vecmath.h
  ../include/camera.hpp
+ ../include/curve.hpp
  ../include/group.hpp
  ../include/hit.hpp
  ../include/image.hpp
@@ -85,6 +86,7 @@ CMakeFiles/PA1.dir/src/scene_parser.cpp.o
  ../include/object3d.hpp
  ../include/plane.hpp
  ../include/ray.hpp
+ ../include/revsurface.hpp
  ../include/scene_parser.hpp
  ../include/sphere.hpp
  ../include/stb_image.h

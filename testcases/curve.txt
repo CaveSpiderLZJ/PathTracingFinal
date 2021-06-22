@@ -1,0 +1,99 @@
+
+PerspectiveCamera {
+    center 20 0 0
+    direction -1 0 0
+    up 0 0 1
+    angle 40
+    width 512
+    height 512
+}
+
+Background {
+    color 0 0 0
+}
+
+Materials {
+    numMaterials 5
+    Material { 
+        diffuseColor 0.9 0.88 0.85
+    }
+    Material { 
+        diffuseColor 0.7 0.3 0.3
+    }
+    Material { 
+        diffuseColor 0.3 0.3 0.7
+    }
+    Material {
+        diffuseColor 1 0.9 0
+    }
+    Material {
+        diffuseColor 1 1 1
+        luminance 6 6 6
+    }
+}
+
+Group {
+    numObjects 7
+    MaterialIndex 0
+    Sphere {
+        center -100005 0 0
+        radius 100000
+    }
+    MaterialIndex 1
+    Sphere {
+        center 0 -100005 0
+        radius 100000
+    }
+    MaterialIndex 2
+    Sphere {
+        center 0 100005 0
+        radius 100000
+    }
+    MaterialIndex 0
+    Sphere {
+        center 0 0 -100005
+        radius 100000
+    }
+    MaterialIndex 0
+    Sphere {
+        center 0 0 100005
+        radius 100000
+    }
+    MaterialIndex 4
+    Sphere {
+        center 0 0 5
+        radius 2
+    }
+    MaterialIndex 3
+    RevSurface {
+        profile BsplineCurve {
+            controls
+                [ 0.000000 -0.459543 0.0 ]
+                [ 0.000000 -0.459544 0.0 ]
+                [ 0.000000 -0.459545 0.0 ]
+                [ -0.351882 -0.426747 0.0 ]
+                [ -0.848656 -0.278898 0.0 ]
+                [ -1.112097 0.084005 0.0 ]
+                [ -1.164785 1.105511 0.0 ]
+                [ -0.991667 2.328629 0.0 ]
+                [ -1.029301 2.503360 0.0 ]
+                [ -1.088800 2.345600 0.0 ]
+                [ -1.278000 1.162800 0.0 ]
+                [ -1.214800 0.055200 0.0 ]
+                [ -0.915600 -0.381200 0.0 ]
+                [ -0.380400 -0.622000 0.0 ]
+                [ -0.144000 -0.968400 0.0 ]
+                [ -0.096800 -1.480000 0.0 ]
+                [ -0.128400 -2.112400 0.0 ]
+                [ -0.317200 -2.202800 0.0 ]
+                [ -0.994400 -2.262800 0.0 ]
+                [ -1.214800 -2.323200 0.0 ]
+                [ -1.199200 -2.398400 0.0 ]
+                [ -1.057600 -2.458800 0.0 ]
+                [ -0.711200 -2.458800 0.0 ]
+                [ 0.000000 -2.458800 0.0 ]
+                [ 0.000000 -2.458801 0.0 ]
+                [ 0.000000 -2.458802 0.0 ]
+        }
+    }
+}

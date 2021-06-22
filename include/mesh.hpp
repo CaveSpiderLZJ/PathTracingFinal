@@ -95,9 +95,11 @@ public:
     std::vector<Vector3f> normals;
     BSPNode* root;
     bool* hasIntersected;
+    TriangleIndex interIdx;     // 相交三角形id，专用于计算参数曲面的参数tu
 
     bool intersect(const Ray &r, Hit &h, float tmin, float& u, float& v) override;
     Mesh(const char *filename, Material *m);
+    Mesh(const std::vector<Vector3f>& data, Material* mat, int m, int n);
     ~Mesh();
 
     void initBSP();      // 初始化BST树
