@@ -1,0 +1,135 @@
+
+PerspectiveCamera {
+    center 20 0 0
+    direction -1 0 0
+    up 0 0 1
+    angle 40
+    width 800
+    height 800
+    focus 18.5
+    field 0.8
+}
+
+Background {
+    color 0 0 0
+}
+
+Materials {
+    numMaterials 10
+    Material { 
+        diffuseColor 0.9 0.88 0.85
+    }
+    Material { 
+        diffuseColor 0.7 0.3 0.3
+    }
+    Material { 
+        diffuseColor 0.3 0.3 0.7
+    }
+    Material { 
+        diffuseColor 0 0.8 1
+        luminance 0 0.8 1
+    }
+    Material { 
+        diffuseColor 1 0.32 0.32
+        luminance 1 0.32 0.32
+    }
+    Material { 
+        diffuseColor 0.406 0.93 0.539
+    }
+    Material {
+        diffuseColor 1 0.6 0
+        Fresnel {
+            fbase 0.85
+            fscale 0
+            power 1
+        }
+    }
+    Material {
+        diffuseColor 1 1 1
+        luminance 10 10 10
+    }
+    Material {
+        diffuseColor 0.95 0.95 0.95
+        Fresnel {
+            fbase 0.95
+            fscale 0
+            power 1
+        }
+    }
+    Material {
+        diffuseColor 1 1 1
+        refractiveIndex 1.5
+        Fresnel {
+            fbase 0.05
+            fscale 0.92
+            power 15
+        }
+    }
+}
+
+Group {
+    numObjects 12
+    MaterialIndex 0
+    Plane {
+	    normal 1 0 0
+        offset -5
+    }
+    MaterialIndex 1
+    Plane {
+	    normal 0 1 0
+        offset -5
+    }
+    MaterialIndex 2
+    Plane {
+	    normal 0 -1 0
+        offset -5
+    }
+    MaterialIndex 0
+    Plane {
+	    normal 0 0 1
+        offset -5
+    }
+    MaterialIndex 0
+    Plane {
+	    normal 0 0 -1
+        offset -5
+    }
+    MaterialIndex 7
+    Sphere {
+        center 0 0 604.995
+        radius 600
+    }
+    MaterialIndex 9
+    Transform {
+        Translate 0 0 -3.5
+        Scale 2 2 1.495
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
+    }
+    MaterialIndex 8
+    Sphere {
+        center 0 0 0
+        radius 2
+    }
+    MaterialIndex 3
+    Sphere {
+        center -3.5 -2.5 -3.5
+        radius 1.5
+    }
+    MaterialIndex 5
+    Sphere {
+        center -2 3.5 -3.5
+        radius 1.5
+    }
+    MaterialIndex 6
+    Sphere {
+        center 2.5 -3.5 -3.5
+        radius 1.5
+    }
+    MaterialIndex 4
+    Sphere {
+        center 4.5 3.5 -3.5
+        radius 1.5
+    }
+}
