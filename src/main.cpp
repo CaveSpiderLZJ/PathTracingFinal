@@ -22,12 +22,12 @@
 #define TMIN 1e-5
 #define DELTA 1e-5
 #define PROGRESS_NUM 10         // 画图时进度信息数目 
-#define SAMPLING_TIMES 10     // 蒙特卡洛光线追踪采样率
-#define THREAD_NUM 10           // 线程数
+#define SAMPLING_TIMES 3000     // 蒙特卡洛光线追踪采样率
+#define THREAD_NUM 12           // 线程数
 
-int randType(const float& reflectIntensity, const float& refractIntensity){
+int randType(const float& reflectIntensity, const float& refractIntensity, unsigned short* seed){
     // 输入折射率，反射率，用轮盘赌决定光线种类，折射反射漫反射返回012
-    float p = float(rand()) / RAND_MAX;
+    float p = erand48(seed);
     int type;
     if(p <= reflectIntensity) type = 0;
     else if(p <= reflectIntensity + refractIntensity) type = 1;
@@ -35,10 +35,10 @@ int randType(const float& reflectIntensity, const float& refractIntensity){
     return type;
 }
 
-Vector3f randDirection(const Vector3f& normal){
+Vector3f randDirection(const Vector3f& normal, unsigned short* seed){
     // 输入一个法向，返回一个在法向所指的半球上的随机单位向量
-    float theta = 2 * M_PI * rand() / RAND_MAX;
-    float r = float(rand()) / RAND_MAX;
+    float theta = 2 * M_PI * erand48(seed);
+    float r = erand48(seed);
     float rs = sqrt(r);
     Vector3f u = (Vector3f::cross((normal[0]) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0), normal)).normalized();
     Vector3f v = Vector3f::cross(normal, u);
@@ -69,12 +69,13 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                  "### thread " << threadID << ' ' << std::fixed << std::setprecision(3)
                     << float(x-startX) / (endX-startX) << " finished." << std::endl;
         }
+        unsigned short seed[3] = {0, 0, x*x*x};
         for(int y = 0; y < camera->getHeight(); y++){
             Vector3f color = Vector3f::ZERO;
             for(int _ = 0; _ < SAMPLING_TIMES; _++){
                 // 蒙特卡洛采样SAMPLING_TIMES次
-                Ray currentRay = camera->generateRay(Vector2f(x + float(rand()) / RAND_MAX - 0.5f,
-                    y + float(rand()) / RAND_MAX - 0.5f));
+                Ray currentRay = camera->generateRay(Vector2f(x + erand48(seed) - 0.5f,
+                    y + erand48(seed) - 0.5f), seed);
                 while(true){
                     // 进行一次采样，直接加到color中
                     Hit hit;
@@ -134,14 +135,14 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             Vector3f c = material->getDiffuseColor(u, v);
                             float rgbMax = (c[0] > c[1]) ? (c[0] > c[2] ? c[0] : c[2])
                                 : (c[1] > c[2] ? c[1] : c[2]);
-                            if(float(rand()) / RAND_MAX < rgbMax && currentRay.depth <= MAX_DEPTH)
+                            if(erand48(seed) < rgbMax && currentRay.depth <= MAX_DEPTH)
                                 ratio = 1 / rgbMax;
                             else{
                                 color += material->luminance * currentRay.pastColor;
                                 break;
                             }
                         }
-                        int type = randType(reflectIntensity, refractIntensity);
+                        int type = randType(reflectIntensity, refractIntensity, seed);
                         color += material->luminance * currentRay.pastColor;
                         currentRay.pastColor = currentRay.pastColor * material->getDiffuseColor(u, v) * ratio;  
                         // 轮盘赌确定下一次光线是反射折射还是漫反射
@@ -160,7 +161,7 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         else{
                             // 2 漫反射光线
                             // 决定漫反射光线方向
-                            Vector3f diffuseDirection = randDirection(normal);
+                            Vector3f diffuseDirection = randDirection(normal, seed);
                             currentRay.origin = origin + DELTA * diffuseDirection;
                             currentRay.direction = diffuseDirection;
                             currentRay.isOutside = reflectIsOutside;
