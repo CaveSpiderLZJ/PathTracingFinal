@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 512
-    height 512
+    width 256
+    height 256
     focus 20
     field 0
 }
@@ -15,7 +15,7 @@ Background {
 }
 
 Materials {
-    numMaterials 6
+    numMaterials 7
     Material { 
         diffuseColor 0.9 0.88 0.85
     }
@@ -39,6 +39,14 @@ Materials {
             fbase 0.05
             fscale 0.92
             power 10
+        }
+    }
+    Material {
+        diffuseColor 1 1 1
+        Fresnel {
+            fbase 0.95
+            fscale 0
+            power 1
         }
     }
 }
@@ -78,10 +86,12 @@ Group {
     }
     MaterialIndex 5
     Transform {
-        Translate 0 -1 -3
-        Scale 2 2 2
+        Translate -1 0 -3.5
+        Scale 15 15 15
+        XRotate 90
+        YRotate 90
         TriangleMesh {
-            obj_file mesh/cube.obj
+            obj_file mesh/bunny_200.obj
         }
     }
 }

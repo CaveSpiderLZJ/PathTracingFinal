@@ -87,7 +87,7 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                     bool isOutside = true;      // 入射光线是否在物体外面
                     if(Vector3f::dot(currentRay.direction, normal) > 0.0f){
                         isOutside = false;
-                        normal = -normal;   // normal现在始终和入射光线反向
+                        normal = Vector3f::ZERO - normal;   // normal现在始终和入射光线反向
                     }
                     if(isIntersect){
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
@@ -99,7 +99,7 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         Vector3f refractDirection;
                         Material* material = hit.material;
                         Fresnel fresnel = material->fresnel;
-                        float dotIN = -Vector3f::dot(currentRay.direction.normalized(), normal);
+                        float dotIN = 0.0f - Vector3f::dot(currentRay.direction.normalized(), normal);
                         if(isOutside){
                             //光疏到光密，正常计算
                             reflectIntensity = fresnel.fbase + fresnel.fscale * pow((1.0f - dotIN), fresnel.power);

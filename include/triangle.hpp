@@ -42,7 +42,7 @@ public:
             return false;
         }
         Vector3f n;
-        if(Vector3f::dot(Rd, normal) > 0) n = -1 * normal;
+        if(Vector3f::dot(Rd, normal) > 0.0f) n = Vector3f::ZERO - normal;
         else n = normal;
         hit.set(res[0], material, n);
         return true;

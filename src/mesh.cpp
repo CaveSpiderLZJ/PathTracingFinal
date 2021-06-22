@@ -146,16 +146,22 @@ Mesh::Mesh(const std::vector<Vector3f>& v, Material* mat, int m, int n){
             int delta = (i < m-1) ? 0 : (m*n);
             if(j != n-2){
                 TriangleIndex tri1;
+                // tri1[0] = i * n + j;
+                // tri1[2] = tri1[0] + 1;
+                // tri1[1] = tri1[2] + n - delta;
                 tri1[0] = i * n + j;
-                tri1[2] = tri1[0] + 1;
-                tri1[1] = tri1[2] + n - delta;
+                tri1[1] = tri1[0] + 1;
+                tri1[2] = tri1[1] + n - delta;
                 triangles.push_back(tri1);
             }
             if(j != 0){
                 TriangleIndex tri2;
+                // tri2[0] = i * n + j;
+                // tri2[1] = tri2[0] + n - delta;
+                // tri2[2] = tri2[1] + 1;
                 tri2[0] = i * n + j;
-                tri2[1] = tri2[0] + n - delta;
-                tri2[2] = tri2[1] + 1;
+                tri2[2] = tri2[0] + n - delta;
+                tri2[1] = tri2[2] + 1;
                 triangles.push_back(tri2);
             }
         }
