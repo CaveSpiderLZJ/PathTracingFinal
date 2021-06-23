@@ -57,7 +57,7 @@ public:
             else t = (disFoot2Intersect - disFoot2Origin) / ray.getDirection().normalized().length();
             if(t < tmin)return false;
             intersect = ray.getOrigin() + t * ray.getDirection().normalized();
-            normal = (center - intersect).normalized(); 
+            normal = (center - intersect).normalized();
         }
         Vector3f dir = intersect - center;
         if(dir[0] > 0.0f) u = 0.25f + atan(intersect[1] / intersect[0]) / (2 * M_PI);

@@ -106,7 +106,10 @@ public:
             }
         }
         return;
+    }
 
+    ~BsplineBase(){
+        delete[] res;
     }
 
     double basis(int i, int p){
@@ -124,36 +127,16 @@ protected:
 public:
     explicit Curve(std::vector<Vector3f> points) : controls(std::move(points)) {}
 
-    bool intersect(const Ray &r, Hit &h, float tmin) override {
+    virtual bool intersect(const Ray &r, Hit &h, float tmin, float& u, float& v) override{
         return false;
     }
 
-    std::vector<Vector3f> &getControls() {
+    std::vector<Vector3f>& getControls() {
         return controls;
     }
 
     virtual void discretize(int resolution, std::vector<CurvePoint>& data) = 0;
-
-    void drawGL() override {
-        Object3D::drawGL();
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
-        glDisable(GL_LIGHTING);
-        glColor3f(1, 1, 0);
-        glBegin(GL_LINE_STRIP);
-        for (auto & control : controls) { glVertex3fv(control); }
-        glEnd();
-        glPointSize(4);
-        glBegin(GL_POINTS);
-        for (auto & control : controls) { glVertex3fv(control); }
-        glEnd();
-        std::vector<CurvePoint> sampledPoints;
-        discretize(30, sampledPoints);
-        glColor3f(1, 1, 1);
-        glBegin(GL_LINE_STRIP);
-        for (auto & cp : sampledPoints) { glVertex3fv(cp.V); }
-        glEnd();
-        glPopAttrib();
-    }
+    virtual CurvePoint pointAtPara(float tu) = 0;
 };
 
 class BezierCurve : public Curve {
@@ -174,22 +157,36 @@ public:
             for(int j = 0; j < resolution; j++){
                 // N + 1个控制点，要画N段，每段resolution个点
                 // 参数t，映射到[0, 1]
-                double t = double(i * resolution + j) / (N * resolution);
-                Bernstein* bernstein = new Bernstein(N, t);
+                double t = double(i * resolution + j) / (N * resolution - 1);
+                Bernstein bernstein(N, t);
                 CurvePoint point;
                 point.V = Vector3f::ZERO;
                 point.T = Vector3f::ZERO;
                 for(int k = 0; k <= N; k++){
-                    point.V += bernstein->basis(k, N) * controls[k];
-                    double db = bernstein->dbasis(k, N);
-                    point.T += bernstein->dbasis(k, N) * controls[k];
+                    point.V += bernstein.basis(k, N) * controls[k];
+                    double db = bernstein.dbasis(k, N);
+                    point.T += bernstein.dbasis(k, N) * controls[k];
                 }
                 point.T.normalize();
                 data.push_back(point);
-                delete bernstein;
             }
         }
         return;
+    }
+
+    virtual CurvePoint pointAtPara(float tu){
+        int N = controls.size() - 1;
+        Bernstein bernstein(N, tu);
+        CurvePoint point;
+        point.V = point.T = Vector3f::ZERO;
+        point.T = Vector3f::ZERO;
+        for(int k = 0; k <= N; k++){
+            point.V += bernstein.basis(k, N) * controls[k];
+            double db = bernstein.dbasis(k, N);
+            point.T += bernstein.dbasis(k, N) * controls[k];
+        }
+        point.T.normalize();
+        return point;
     }
 
 protected:
@@ -216,20 +213,34 @@ public:
                 // N + 1个控制点，要画N + 1 - K段，每段resolution个点
                 // 参数t，映射到[t_{k-1}, t_{n+1}]，offset为K
                 double t = double((K+i) * resolution + j) / ((N + K + 1) * resolution);
-                BsplineBase* bsplineBase = new BsplineBase(N, K, t);
+                BsplineBase bsplineBase(N, K, t);
                 CurvePoint point;
                 point.V = Vector3f::ZERO;
                 point.T = Vector3f::ZERO;
                 for(int l = 0; l <= N; l++){
-                    point.V += bsplineBase->basis(l, K) * controls[l];
-                    point.T += bsplineBase->dbasis(l, K) * controls[l];
+                    point.V += bsplineBase.basis(l, K) * controls[l];
+                    point.T += bsplineBase.dbasis(l, K) * controls[l];
                 }
                 point.T.normalize();
                 data.push_back(point);
-                delete bsplineBase;
             }
         }
         return;
+    }
+
+    virtual CurvePoint pointAtPara(float tu){
+        int N = controls.size() - 1;
+        int K = 3;
+        BsplineBase bsplineBase(N, K, tu);
+        CurvePoint point;
+        point.V = Vector3f::ZERO;
+        point.T = Vector3f::ZERO;
+        for(int l = 0; l <= N; l++){
+            point.V += bsplineBase.basis(l, K) * controls[l];
+            point.T += bsplineBase.dbasis(l, K) * controls[l];
+        }
+        point.T.normalize();
+        return point;
     }
 };
 

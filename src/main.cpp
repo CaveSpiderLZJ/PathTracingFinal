@@ -17,17 +17,17 @@
 #include <queue>
 #include "omp.h"
 
-#define MAX_DEPTH 8            // 光线跟踪最大迭代次数
-#define RR 4                    // 俄罗斯轮盘赌终结
+#define MAX_DEPTH 6            // 光线跟踪最大迭代次数
+#define RR 3                    // 俄罗斯轮盘赌终结
 #define TMIN 1e-3
-#define DELTA 1e-5
-#define PROGRESS_NUM 10         // 画图时进度信息数目 
-#define SAMPLING_TIMES 2000     // 蒙特卡洛光线追踪采样率
-#define THREAD_NUM 10           // 线程数
+#define DELTA 1e-4
+#define PROGRESS_NUM 5         // 画图时进度信息数目 
+#define SAMPLING_TIMES 2000    // 蒙特卡洛光线追踪采样率
+#define THREAD_NUM 12        // 线程数
 
-int randType(const float& reflectIntensity, const float& refractIntensity){
+int randType(const float& reflectIntensity, const float& refractIntensity, unsigned short* seed){
     // 输入折射率，反射率，用轮盘赌决定光线种类，折射反射漫反射返回012
-    float p = float(rand()) / RAND_MAX;
+    float p = erand48(seed);
     int type;
     if(p <= reflectIntensity) type = 0;
     else if(p <= reflectIntensity + refractIntensity) type = 1;
@@ -35,14 +35,13 @@ int randType(const float& reflectIntensity, const float& refractIntensity){
     return type;
 }
 
-Vector3f randDirection(const Vector3f& normal){
+Vector3f randDirection(const Vector3f& normal, unsigned short* seed){
     // 输入一个法向，返回一个在法向所指的半球上的随机单位向量
-    float theta = 2 * M_PI * rand() / RAND_MAX;
-    float r = float(rand()) / RAND_MAX;
+    float theta = 2 * M_PI * erand48(seed);
+    float r = erand48(seed);
     float rs = sqrt(r);
     Vector3f u = (Vector3f::cross((normal[0]) > 0.1 ? Vector3f(0, 1, 0) : Vector3f(1, 0, 0), normal)).normalized();
-    Vector3f v = Vector3f::cross(normal, u); 
-    Vector3f res = Vector3f::ZERO;
+    Vector3f v = Vector3f::cross(normal, u);
     return (rs*cos(theta)*u + rs*sin(theta)*v + normal*sqrt(1-r)).normalized();
 }
 
@@ -70,21 +69,27 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                  "### thread " << threadID << ' ' << std::fixed << std::setprecision(3)
                     << float(x-startX) / (endX-startX) << " finished." << std::endl;
         }
+        unsigned short seed[3] = {0, 0, x*x*x};
         for(int y = 0; y < camera->getHeight(); y++){
             Vector3f color = Vector3f::ZERO;
             for(int _ = 0; _ < SAMPLING_TIMES; _++){
                 // 蒙特卡洛采样SAMPLING_TIMES次
-                Ray currentRay = camera->generateRay(Vector2f(x + float(rand()) / RAND_MAX - 0.5f,
-                    y + float(rand()) / RAND_MAX - 0.5f));
+                Ray currentRay = camera->generateRay(Vector2f(x + erand48(seed) - 0.5f,
+                    y + erand48(seed) - 0.5f), seed);
                 while(true){
                     // 进行一次采样，直接加到color中
                     Hit hit;
                     float u = 0.0f, v = 0.0f;
+                    //std::cout << "### before intersect" << std::endl;
                     bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN, u, v);
+                    //std::cout << "### after intersect" << std::endl;
                     Vector3f normal = hit.normal.normalized();
+                    bool isOutside = true;      // 入射光线是否在物体外面
+                    if(Vector3f::dot(currentRay.direction, normal) > 0.0f){
+                        isOutside = false;
+                        normal = Vector3f::ZERO - normal;   // normal现在始终和入射光线反向
+                    }
                     if(isIntersect){
-                        //std::cout << "### u: " << u << " v: " << v << std::endl;
-
                         Vector3f origin = currentRay.pointAtParameter(hit.t);
                         Vector3f foot = origin + normal * 
                             Vector3f::dot(currentRay.origin - origin, normal);
@@ -94,11 +99,9 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         Vector3f refractDirection;
                         Material* material = hit.material;
                         Fresnel fresnel = material->fresnel;
-                        float dotIN = -1 * Vector3f::dot(currentRay.direction.normalized(), normal);
-                        bool reflectIsOutside = true;
-                        if(currentRay.isOutside){
+                        float dotIN = 0.0f - Vector3f::dot(currentRay.direction.normalized(), normal);
+                        if(isOutside){
                             //光疏到光密，正常计算
-                            reflectIsOutside = true;
                             reflectIntensity = fresnel.fbase + fresnel.fscale * pow((1.0f - dotIN), fresnel.power);
                             refractIntensity = fresnel.fbase + fresnel.fscale - reflectIntensity;
                             float sinS = sqrt(1.0f - dotIN * dotIN) / material->refractiveIndex;
@@ -108,7 +111,6 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                         }
                         else{
                             // 光密到光疏，注意临界折射角
-                            reflectIsOutside = false;
                             float sinS = sqrt(1.0f - dotIN * dotIN) * material->refractiveIndex;
                             if(sinS >= 1.0f){
                                 // 到达临界角，发生全反射
@@ -135,14 +137,14 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             Vector3f c = material->getDiffuseColor(u, v);
                             float rgbMax = (c[0] > c[1]) ? (c[0] > c[2] ? c[0] : c[2])
                                 : (c[1] > c[2] ? c[1] : c[2]);
-                            if(float(rand()) / RAND_MAX < rgbMax && currentRay.depth <= MAX_DEPTH)
+                            if(erand48(seed) < rgbMax && currentRay.depth <= MAX_DEPTH)
                                 ratio = 1 / rgbMax;
                             else{
                                 color += material->luminance * currentRay.pastColor;
                                 break;
                             }
                         }
-                        int type = randType(reflectIntensity, refractIntensity);
+                        int type = randType(reflectIntensity, refractIntensity, seed);
                         color += material->luminance * currentRay.pastColor;
                         currentRay.pastColor = currentRay.pastColor * material->getDiffuseColor(u, v) * ratio;  
                         // 轮盘赌确定下一次光线是反射折射还是漫反射
@@ -150,21 +152,18 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             // 0 反射光线
                             currentRay.origin = origin + DELTA * reflectDirection;
                             currentRay.direction = reflectDirection;
-                            currentRay.isOutside = reflectIsOutside;
                         }
                         else if(type == 1){
                             // 1 折射光线
                             currentRay.origin = origin + DELTA * refractDirection;
                             currentRay.direction = refractDirection;
-                            currentRay.isOutside = !reflectIsOutside;
                         }
                         else{
                             // 2 漫反射光线
                             // 决定漫反射光线方向
-                            Vector3f diffuseDirection = randDirection(normal);
+                            Vector3f diffuseDirection = randDirection(normal, seed);
                             currentRay.origin = origin + DELTA * diffuseDirection;
                             currentRay.direction = diffuseDirection;
-                            currentRay.isOutside = reflectIsOutside;
                         }
                     }
                     else{

@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 800
-    height 800
+    width 512
+    height 512
     focus 20
     field 0
 }
@@ -15,7 +15,7 @@ Background {
 }
 
 Materials {
-    numMaterials 6
+    numMaterials 9
     Material { 
         diffuseColor 0.9 0.88 0.85
     }
@@ -26,29 +26,47 @@ Materials {
         diffuseColor 0.3 0.3 0.7
     }
     Material {
-        diffuseColor 1 0.6 0
+        diffuseColor 1 0.9 0
+        luminance 0.7 0.63 0
+    }
+    Material {
+        diffuseColor 1 1 1
+        luminance 10 10 10
+    }
+    Material {
+        diffuseColor 1 1 1
+        refractiveIndex 1.5
         Fresnel {
-            fbase 0.85
-            fscale 0
-            power 1
+            fbase 0.05
+            fscale 0.92
+            power 10
         }
     }
     Material {
         diffuseColor 1 1 1
-        luminance 12 12 12
-    }
-    Material {
-        diffuseColor 0.95 0.95 0.95
         Fresnel {
             fbase 0.95
             fscale 0
             power 1
         }
     }
+    Material { 
+        diffuseColor 0.406 0.93 0.539
+        Fresnel {
+            fbase 0.9
+            fscale 0
+            power 1
+        }
+    }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/porcelain.png
+    }
 }
 
 Group {
     numObjects 8
+    MaterialIndex 0
     MaterialIndex 0
     Plane {
 	    normal 1 0 0
@@ -79,21 +97,25 @@ Group {
         center 0 0 604.995
         radius 600
     }
-    MaterialIndex 5
+    MaterialIndex 8
     Transform {
-        Translate 0 0 -3.7
-        Scale 3 3 1.3
-        TriangleMesh {
-            obj_file mesh/cube.obj
+        XRotate -90
+        RevSurface {
+            profile BezierCurve {
+                controls
+                    [ -2 2 0 ]
+                    [ -4 0 0 ]
+                    [ 0 0 0 ]
+                    [ -2.5 -2.5 0 ]
+            }
         }
     }
-    MaterialIndex 3
+    MaterialIndex 6
     Transform {
-        Scale 3.5 3.5 3.5
-        XRotate 90
-        YRotate 90
+        Translate 0 0 -3.5
+        Scale 3 3 1.5
         TriangleMesh {
-            obj_file mesh/dragon_100k.obj
+            obj_file mesh/cube.obj
         }
     }
 }
