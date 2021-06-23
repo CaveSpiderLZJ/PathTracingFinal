@@ -34,8 +34,8 @@ mkdir -p output
 # bin/PA1 testcases/dragon.txt output/dragon.bmp
 # bin/PA1 testcases/room.txt output/room.bmp
 # bin/PA1 testcases/earth.txt output/earth.bmp
-# bin/PA1 testcases/curve.txt output/curve.bmp
+bin/PA1 testcases/drop.txt output/drop.bmp
 # bin/PA1 testcases/dragon.txt output/dragon.bmp
 # bin/PA1 testcases/depth.txt output/depth.bmp
 # bin/PA1 testcases/porcelain.txt output/porcelain.bmp
-bin/PA1 testcases/texture.txt output/texture.bmp
+# bin/PA1 testcases/texture.txt output/texture.bmp
