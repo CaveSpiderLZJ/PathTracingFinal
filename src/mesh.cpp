@@ -7,7 +7,7 @@
 #include <sstream>
 #include <queue>
 
-#define MIN_TRIANGLE 16      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
+#define MIN_TRIANGLE 8      // 当BSP一个节点包含的三角形少于这个数时，不再扩展它
 #define MIN_SIZE 0.02f         // 当一个包围盒的最大边长小于这个数时，就不再扩展
 
 bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
@@ -33,12 +33,10 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
             if(currentNode->leftChild == nullptr && currentNode->rightChild == nullptr){
                 // 当前节点为叶子结点
                 if(currentNode->triangleIdx.size() > 0)
-                    // std::cout << "### size: " << currentNode->triangleIdx.size() << std::endl;
                 for(int i = 0; i < currentNode->triangleIdx.size(); i++){
                     // 遍历当前节点的所有三角形编号，如果没有加入过，就加入candidates
                     int idx = currentNode->triangleIdx[i];
                     if(hasIntersected[idx] == false){
-                        //std::cout << "### push" << std::endl;
                         candidates.push_back(idx);
                         hasIntersected[idx] = true;
                     }
@@ -58,8 +56,6 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     Vector3f n;
     Material* m;
     bool isIntersected = false;
-    //if(candidates.size() > 0)
-        //std::cout << "### size: " << candidates.size() << std::endl;
     for (int i = 0; i < int(candidates.size()); i++) {
         TriangleIndex& triIndex = triangles[candidates[i]];
         Triangle triangle(vertices[triIndex[0]],
@@ -74,12 +70,10 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     }
     if(!isIntersected) return false;
     hit.set(t, m, n);
-    //std::cout << "### true" << std::endl;
     return true;
 }
 
 Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
-
     // Optional: Use tiny obj loader to replace this simple one.
     std::ifstream f;
     f.open(filename);
@@ -164,7 +158,6 @@ Mesh::Mesh(const std::vector<Vector3f>& v, Material* mat, int m, int n){
     }
     initBSP();
     hasIntersected = new bool[triangles.size()];
-    //std::cout << "### triangles.size(): " << triangles.size() << std::endl;
 }
 
 Mesh::~Mesh(){
@@ -212,7 +205,6 @@ void Mesh::initBSP(){
     }
     root = new BSPNode(minPos, maxPos, 0);
     std::queue<BSPNode*> nodes;      // 待计算并扩展的节点队列
-    int cnt = 1;
     nodes.push(root);
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();
@@ -226,7 +218,6 @@ void Mesh::initBSP(){
                 maxPartition = i;
             }
         }
-        // std::cout << "### maxSize: " << maxSize << std::endl;
         if(currentNode->triangleIdx.size() > MIN_TRIANGLE && maxSize > MIN_SIZE){
             // 当前节点的三角形数量且包围盒大小超过了下限，继续扩展
             float mean = (minPos[maxPartition] + maxPos[maxPartition]) / 2.0f;
@@ -234,16 +225,13 @@ void Mesh::initBSP(){
             maxPos[maxPartition] = mean;
             currentNode->leftChild = new BSPNode(minPos, maxPos, currentNode);
             nodes.push(currentNode->leftChild);
-            cnt++;
             minPos[maxPartition] = mean;
             maxPos[maxPartition] = tmpMax;
             currentNode->rightChild = new BSPNode(minPos, maxPos, currentNode);
             nodes.push(currentNode->rightChild);
-            cnt++;
         }
         nodes.pop();
     }
-    //std::cout << "### cnt: " << cnt << std::endl;
     return;
 }
 
@@ -252,41 +240,37 @@ void Mesh::computeTriangle(BSPNode* node){
     // 并更新node->triangleIdx
     node->triangleIdx.clear();
     BSPNode* father = node->father;
-    Vector3f minPos, maxPos;
+    Vector3f minPos, maxPos, triMinPos, triMaxPos;  // 本节点和某个三角形的包围盒
     node->getBounding(minPos, maxPos);
+    std::vector<int> testIdx;
     if(father == nullptr){
-        // 树根，用Mesh里的全部三角形算
-        for(int i = 0; i < triangles.size(); i++){
-            // i 就是三角形编号，检查这个三角形是否有某点在包围盒里
-            bool inside = false;
-            for(int j = 0; j < 3; j++){
-                Vector3f pos = vertices[triangles[i][j]];
-                if(minPos[0] <= pos[0] && pos[0] <= maxPos[0] &&
-                    minPos[1] <= pos[1] && pos[1] <= maxPos[1] &&
-                    minPos[2] <= pos[2] && pos[2] <= maxPos[2]){
-                    inside = true;
-                    break;
-                }
-            }
-            if(inside) node->triangleIdx.push_back(i);
-        }
+        for(int i = 0; i < triangles.size(); i++)
+            testIdx.push_back(i);
     }
     else{
-        // 内部节点所有三角形一定包含于其父亲，用父亲的三角形算
-        for(int i = 0; i < father->triangleIdx.size(); i++){
-            // father->triangleIdx[i]是三角形编号，检查这个三角形是否有某点在包围盒里
-            bool inside = false;
-            for(int j = 0; j < 3; j++){
-                Vector3f pos = vertices[triangles[father->triangleIdx[i]][j]];
-                if(minPos[0] <= pos[0] && pos[0] <= maxPos[0] &&
-                    minPos[1] <= pos[1] && pos[1] <= maxPos[1] &&
-                    minPos[2] <= pos[2] && pos[2] <= maxPos[2]){
-                    inside = true;
-                    break;
-                }
+        for(int i = 0; i < father->triangleIdx.size(); i++)
+            testIdx.push_back(father->triangleIdx[i]);
+    }
+    for(int i = 0; i < testIdx.size(); i++){
+        // i 是三角形编号，检查这个三角形是否有某点在包围盒里
+        triMinPos = Vector3f(1e8, 1e8, 1e8);
+        triMaxPos = Vector3f(-1e8, -1e8, -1e8);
+        for(int j = 0; j < 3; j++){
+            Vector3f pos = vertices[triangles[testIdx[i]][j]];   // 三角形一个点
+            for(int k = 0; k < 3; k++){
+                if(pos[k] < triMinPos[k]) triMinPos[k] = pos[k];
+                if(pos[k] > triMaxPos[k]) triMaxPos[k] = pos[k];
             }
-            if(inside) node->triangleIdx.push_back(father->triangleIdx[i]);
         }
+        // 判断三角形和长方体包围盒是否相交
+        bool inter = true;
+        for(int j = 0; j < 3; j++){
+            if(fabs(triMinPos[j] + triMaxPos[j] - minPos[j] - maxPos[j])
+                > maxPos[j] - minPos[j] + triMaxPos[j] - triMinPos[j]){
+                    inter = false; break;
+                }
+        }
+        if(inter) node->triangleIdx.push_back(testIdx[i]);
     }
     return;
 }

@@ -78,8 +78,7 @@ public:
         Vector3f intersect = center + direction * focus;  // center in screen
         intersect += (point[0] - width / 2.0f) * (focus / dis) * horizontal;
         intersect += (point[1] - height / 2.0f) * (focus / dis) * up;
-        Vector3f start = center;
-        if(field != 0.0f) start += randDelta(seed);
+        Vector3f start = center + randDelta(seed);
         return Ray(start, (intersect - start).normalized(), Vector3f(1, 1, 1), 0);
     }
 };
