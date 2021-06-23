@@ -15,7 +15,7 @@ Background {
 }
 
 Materials {
-    numMaterials 8
+    numMaterials 9
     Material { 
         diffuseColor 0.9 0.88 0.85
     }
@@ -58,10 +58,14 @@ Materials {
             power 1
         }
     }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/porcelain.png
+    }
 }
 
 Group {
-    numObjects 9
+    numObjects 8
     MaterialIndex 0
     MaterialIndex 0
     Plane {
@@ -93,29 +97,25 @@ Group {
         center 0 0 604.995
         radius 600
     }
-    MaterialIndex 6
+    MaterialIndex 8
     Transform {
-        Translate 0.2 0 -2
-        XRotate 90
-        YRotate -90
+        XRotate -90
         RevSurface {
             profile BezierCurve {
                 controls
-                    [ 0 3 0 ]
-                    [ 3 1 0 ]
-                    [ 3 -3 0 ]
-                    [ 0 -3 0 ]
+                    [ -2 2 0 ]
+                    [ -4 0 0 ]
+                    [ 0 0 0 ]
+                    [ -2.5 -2.5 0 ]
             }
         }
     }
-    MaterialIndex 7
-    Sphere {
-        center -3 -2.2 -3
-        radius 2
-    }
-    MaterialIndex 3
-    Sphere {
-        center -2 2.5 -3
-        radius 2
+    MaterialIndex 6
+    Transform {
+        Translate 0 0 -3.5
+        Scale 3 3 1.5
+        TriangleMesh {
+            obj_file mesh/cube.obj
+        }
     }
 }

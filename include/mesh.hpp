@@ -21,18 +21,16 @@ public:
     Vector3f minPos;
     Vector3f maxPos;
     // 本节点的孩子节点根据哪一维度来划分，012 for xyz
-    int nextPartition;
 
     BSPNode() = delete;
 
     BSPNode(const Vector3f& _minPos, const Vector3f& _maxPos,
-        int _nextPartition, BSPNode* _father = nullptr){
+        BSPNode* _father = nullptr){
         // 创建BSP节点的时候就定义好其包围盒的范围
         leftChild = nullptr;
         rightChild = nullptr;
         minPos = _minPos;
         maxPos = _maxPos;
-        nextPartition = _nextPartition;
         father = _father;
         return;
     }
@@ -50,18 +48,18 @@ public:
             float tmin, tmax;
             if(isPositive){
                 tmin = (minPos[i] - origin[i]) / direction[i];
-                if(tmin > maxTmin) maxTmin = tmin;
+                if(tmin >= maxTmin) maxTmin = tmin;
                 tmax = (maxPos[i] - origin[i]) / direction[i];
-                if(tmax < minTmax) minTmax = tmax;
+                if(tmax <= minTmax) minTmax = tmax;
             }
             else{
                 tmin = (maxPos[i] - origin[i]) / direction[i];
-                if(tmin > maxTmin) maxTmin = tmin;
+                if(tmin >= maxTmin) maxTmin = tmin;
                 tmax = (minPos[i] - origin[i]) / direction[i];
-                if(tmax < minTmax) minTmax = tmax;
+                if(tmax <= minTmax) minTmax = tmax;
             }
         }
-        return (minTmax >= maxTmin);
+        return (minTmax >= maxTmin - 0.001f);
     }
 
     void getBounding(Vector3f& outMinPos, Vector3f& outMaxPos){

@@ -6,6 +6,8 @@ PerspectiveCamera {
     angle 40
     width 800
     height 800
+    focus 20
+    field 0
 }
 
 Background {
