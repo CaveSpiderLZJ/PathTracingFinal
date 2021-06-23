@@ -79,7 +79,7 @@ public:
         intersect += (point[0] - width / 2.0f) * (focus / dis) * horizontal;
         intersect += (point[1] - height / 2.0f) * (focus / dis) * up;
         Vector3f start = center + randDelta(seed);
-        return Ray(start, (intersect - start).normalized(), Vector3f(1, 1, 1), 0, true);
+        return Ray(start, (intersect - start).normalized(), Vector3f(1, 1, 1), 0);
     }
 };
 
