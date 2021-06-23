@@ -41,10 +41,7 @@ public:
         if(res[0] < tmin || res[1] < 0.0f || res[2] < 0.0f || res[1] + res[2] > 1.0f){
             return false;
         }
-        Vector3f n;
-        if(Vector3f::dot(Rd, normal) > 0.0f) n = Vector3f::ZERO - normal;
-        else n = normal;
-        hit.set(res[0], material, n);
+        hit.set(res[0], material, normal);
         return true;
 	}
 };

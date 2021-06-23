@@ -4,10 +4,10 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 800
-    height 800
-    focus 20
-    field 0
+    width 400
+    height 400
+    focus 25
+    field 0.2
 }
 
 Background {
@@ -15,7 +15,7 @@ Background {
 }
 
 Materials {
-    numMaterials 6
+    numMaterials 10
     Material { 
         diffuseColor 0.9 0.88 0.85
     }
@@ -26,6 +26,10 @@ Materials {
         diffuseColor 0.3 0.3 0.7
     }
     Material {
+        diffuseColor 1 1 1
+        luminance 12 12 12
+    }
+    Material {
         diffuseColor 1 0.6 0
         Fresnel {
             fbase 0.85
@@ -34,8 +38,12 @@ Materials {
         }
     }
     Material {
-        diffuseColor 1 1 1
-        luminance 12 12 12
+        diffuseColor 0.95 0.95 0.95
+        Fresnel {
+            fbase 0.05
+            fscale 0.92
+            power 15
+        }
     }
     Material {
         diffuseColor 0.95 0.95 0.95
@@ -45,26 +53,41 @@ Materials {
             power 1
         }
     }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/grid.png
+        textureScale 0.1
+    }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/wall.png
+        textureScale 0.1
+    }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/wood.png
+        textureScale 0.1
+    }
 }
 
 Group {
-    numObjects 8
-    MaterialIndex 0
+    numObjects 6
+    MaterialIndex 7
     Plane {
 	    normal 1 0 0
         offset -5
     }
-    MaterialIndex 1
+    MaterialIndex 8
     Plane {
 	    normal 0 1 0
         offset -5
     }
-    MaterialIndex 2
+    MaterialIndex 8
     Plane {
 	    normal 0 -1 0
         offset -5
     }
-    MaterialIndex 0
+    MaterialIndex 9
     Plane {
 	    normal 0 0 1
         offset -5
@@ -74,26 +97,9 @@ Group {
 	    normal 0 0 -1
         offset -5
     }
-    MaterialIndex 4
+    MaterialIndex 3
     Sphere {
         center 0 0 604.995
         radius 600
-    }
-    MaterialIndex 5
-    Transform {
-        Translate 0 0 -3.7
-        Scale 3 3 1.3
-        TriangleMesh {
-            obj_file mesh/cube.obj
-        }
-    }
-    MaterialIndex 3
-    Transform {
-        Scale 3.5 3.5 3.5
-        XRotate 90
-        YRotate 90
-        TriangleMesh {
-            obj_file mesh/dragon_100k.obj
-        }
     }
 }

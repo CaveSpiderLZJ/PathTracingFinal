@@ -66,12 +66,12 @@ public:
     Vector3f randDelta(unsigned short* seed){
         // return a random delta based on field
         float theta = 2 * M_PI * erand48(seed);
-        float r = erand48(seed);
-        float rs = sqrt(r);
+        float r1 = erand48(seed), r2 = erand48(seed);
+        float r1s = sqrt(r1), r2s = sqrt(r2);
         float dir = 1.0f;
         if(erand48(seed) < 0.5f) dir = -1.0f;
-        return (rs*cos(theta)*Vector3f::UP + rs*sin(theta)*Vector3f::RIGHT
-            + dir*sqrt(1-r)*Vector3f::FORWARD) * field;
+        return (r1s*cos(theta)*Vector3f::UP + r1s*sin(theta)*Vector3f::RIGHT
+            + dir*sqrt(1-r1)*Vector3f::FORWARD) * field * r2s;
     }
 
     Ray generateRay(const Vector2f &point, unsigned short* seed) override {

@@ -1,6 +1,7 @@
 #include "material.hpp"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <cmath>
 
 Fresnel::Fresnel(): fbase(0.0f), fscale(0.0f), power(1.0f) {}
 
@@ -11,9 +12,9 @@ Fresnel::Fresnel(const float& _fbase, const float& _fscale, const float& _power)
 
 Material::Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor,
     const Vector3f& _luminance, float _shininess, float _refractiveIndex,
-    Fresnel _fresnel, const char* filePath):
+    Fresnel _fresnel, const char* filePath, float _textureScale):
     diffuseColor(_diffuseColor), specularColor(_specularColor), luminance(_luminance),
-    shininess(_shininess), refractiveIndex(_refractiveIndex), fresnel(_fresnel) {
+    shininess(_shininess), refractiveIndex(_refractiveIndex), fresnel(_fresnel), textureScale(_textureScale){
     if(filePath[0] != 0)
         texture = stbi_load(filePath, &w, &h, &n, 0);
     else texture = nullptr;
@@ -22,9 +23,16 @@ Material::Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor
 Vector3f Material::getDiffuseColor(float u, float v) const {
     if(texture == nullptr)
         return diffuseColor;
-    float r = texture[n * w * int(v * h) + int(u * w) * n + 0] / 256.0f;
-    float g = texture[n * w * int(v * h) + int(u * w) * n + 1] / 256.0f;
-    float b = texture[n * w * int(v * h) + int(u * w) * n + 2] / 256.0f;
+    u *= textureScale;
+    v *= textureScale;
+    u -= floor(u);
+    v -= floor(v);
+    int idx = n * w * int(v * h) + int(u * w) * n;
+    if(idx < 0) idx = 0;
+    if(idx > n * w * h - 3) idx = n * w * h - 3;
+    float r = texture[idx + 0] / 256.0f;
+    float g = texture[idx + 1] / 256.0f;
+    float b = texture[idx + 2] / 256.0f;
     return Vector3f(r, g, b);
 }
 

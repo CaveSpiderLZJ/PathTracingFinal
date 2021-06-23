@@ -15,7 +15,7 @@ Background {
 }
 
 Materials {
-    numMaterials 7
+    numMaterials 8
     Material { 
         diffuseColor 0.9 0.88 0.85
     }
@@ -27,6 +27,7 @@ Materials {
     }
     Material {
         diffuseColor 1 0.9 0
+        luminance 0.7 0.63 0
     }
     Material {
         diffuseColor 1 1 1
@@ -49,10 +50,18 @@ Materials {
             power 1
         }
     }
+    Material { 
+        diffuseColor 0.406 0.93 0.539
+        Fresnel {
+            fbase 0.9
+            fscale 0
+            power 1
+        }
+    }
 }
 
 Group {
-    numObjects 7
+    numObjects 9
     MaterialIndex 0
     Sphere {
         center -100005 0 0
@@ -83,14 +92,29 @@ Group {
         center 0 0 5
         radius 2
     }
-    MaterialIndex 5
+    MaterialIndex 6
     Transform {
-        Translate -1 0 -3.5
-        Scale 15 15 15
+        Translate 0.2 0 -2
         XRotate 90
-        YRotate 90
-        TriangleMesh {
-            obj_file mesh/bunny_200.obj
+        YRotate -90
+        RevSurface {
+            profile BezierCurve {
+                controls
+                    [ 0 3 0 ]
+                    [ 3 1 0 ]
+                    [ 3 -3 0 ]
+                    [ 0 -3 0 ]
+            }
         }
+    }
+    MaterialIndex 7
+    Sphere {
+        center -3 -2.2 -3
+        radius 2
+    }
+    MaterialIndex 3
+    Sphere {
+        center -2 2.5 -3
+        radius 2
     }
 }

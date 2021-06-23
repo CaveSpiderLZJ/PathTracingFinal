@@ -37,13 +37,14 @@ public:
     float refractiveIndex;
     Fresnel fresnel;
     unsigned char* texture;
+    float textureScale;
     int w, h, n;
 
     Material() = delete;
 
     explicit Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor = Vector3f::ZERO,
         const Vector3f& _luminance = Vector3f::ZERO, float _shininess = 0, float _refractiveIndex = 1.0f,
-        Fresnel _fresnel = Fresnel(), const char* filePath = "\0");
+        Fresnel _fresnel = Fresnel(), const char* filePath = "\0", float textureScale = 1.0f);
 
     virtual ~Material() = default;
 

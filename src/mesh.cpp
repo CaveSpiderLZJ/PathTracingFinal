@@ -22,20 +22,23 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     nodes.push(root);
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();
-        bool currentIntersected = currentNode->intersect(ray);
         if(currentNode == nullptr){
             std::cout << "!!! nullptr found in queue" << std::endl;
             nodes.pop();
             continue;
         }
-        else if(currentIntersected){
+        bool currentIntersected = currentNode->intersect(ray);
+        if(currentIntersected){
             // 光线和当前节点的包围盒有交点
             if(currentNode->leftChild == nullptr && currentNode->rightChild == nullptr){
                 // 当前节点为叶子结点
+                if(currentNode->triangleIdx.size() > 0)
+                    // std::cout << "### size: " << currentNode->triangleIdx.size() << std::endl;
                 for(int i = 0; i < currentNode->triangleIdx.size(); i++){
                     // 遍历当前节点的所有三角形编号，如果没有加入过，就加入candidates
                     int idx = currentNode->triangleIdx[i];
                     if(hasIntersected[idx] == false){
+                        //std::cout << "### push" << std::endl;
                         candidates.push_back(idx);
                         hasIntersected[idx] = true;
                     }
@@ -55,6 +58,8 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     Vector3f n;
     Material* m;
     bool isIntersected = false;
+    //if(candidates.size() > 0)
+        //std::cout << "### size: " << candidates.size() << std::endl;
     for (int i = 0; i < int(candidates.size()); i++) {
         TriangleIndex& triIndex = triangles[candidates[i]];
         Triangle triangle(vertices[triIndex[0]],
@@ -69,6 +74,7 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
     }
     if(!isIntersected) return false;
     hit.set(t, m, n);
+    //std::cout << "### true" << std::endl;
     return true;
 }
 
@@ -143,31 +149,22 @@ Mesh::Mesh(const std::vector<Vector3f>& v, Material* mat, int m, int n){
     vertices = v;
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n - 1; j++){
-            int delta = (i < m-1) ? 0 : m*n;
-            if(j != n-2){
-                TriangleIndex tri1;
-                // tri1[0] = i * n + j;
-                // tri1[2] = tri1[0] + 1;
-                // tri1[1] = tri1[2] + n - delta;
-                tri1[0] = i * n + j;
-                tri1[1] = tri1[0] + 1;
-                tri1[2] = tri1[1] + n - delta;
-                triangles.push_back(tri1);
-            }
-            if(j != 0){
-                TriangleIndex tri2;
-                // tri2[0] = i * n + j;
-                // tri2[1] = tri2[0] + n - delta;
-                // tri2[2] = tri2[1] + 1;
-                tri2[0] = i * n + j;
-                tri2[2] = tri2[0] + n - delta;
-                tri2[1] = tri2[2] + 1;
-                triangles.push_back(tri2);
-            }
+            int delta = (i < m-1) ? 0 : (m*n);
+            TriangleIndex tri1;
+            tri1[0] = i * n + j;
+            tri1[2] = tri1[0] + 1;
+            tri1[1] = tri1[2] + n - delta;
+            triangles.push_back(tri1);
+            TriangleIndex tri2;
+            tri2[0] = i * n + j;
+            tri2[1] = tri2[0] + n - delta;
+            tri2[2] = tri2[1] + 1;
+            triangles.push_back(tri2);
         }
     }
     initBSP();
     hasIntersected = new bool[triangles.size()];
+    //std::cout << "### triangles.size(): " << triangles.size() << std::endl;
 }
 
 Mesh::~Mesh(){
@@ -215,32 +212,38 @@ void Mesh::initBSP(){
     }
     root = new BSPNode(minPos, maxPos, 0);
     std::queue<BSPNode*> nodes;      // 待计算并扩展的节点队列
+    int cnt = 1;
     nodes.push(root);
     while(!nodes.empty()){
         BSPNode* currentNode = nodes.front();
         computeTriangle(currentNode);
-        float maxSize = 0.0f;
+        float maxSize = -1.0f;
         currentNode->getBounding(minPos, maxPos);
+        int maxPartition;
         for(int i = 0; i < 3; i++){
-            maxPos[i] - minPos[i] > maxSize;
-            maxSize = maxPos[i] - minPos[i];
+            if(maxPos[i] - minPos[i] > maxSize){
+                maxSize = maxPos[i] - minPos[i];
+                maxPartition = i;
+            }
         }
         // std::cout << "### maxSize: " << maxSize << std::endl;
         if(currentNode->triangleIdx.size() > MIN_TRIANGLE && maxSize > MIN_SIZE){
             // 当前节点的三角形数量且包围盒大小超过了下限，继续扩展
-            int nextPartition = currentNode->nextPartition;
-            float mean = (minPos[nextPartition] + maxPos[nextPartition]) / 2.0f;
-            float tmpMax = maxPos[nextPartition];
-            maxPos[nextPartition] = mean;
-            currentNode->leftChild = new BSPNode(minPos, maxPos, (nextPartition + 1) % 3, currentNode);
+            float mean = (minPos[maxPartition] + maxPos[maxPartition]) / 2.0f;
+            float tmpMax = maxPos[maxPartition];
+            maxPos[maxPartition] = mean;
+            currentNode->leftChild = new BSPNode(minPos, maxPos, currentNode);
             nodes.push(currentNode->leftChild);
-            minPos[nextPartition] = mean;
-            maxPos[nextPartition] = tmpMax;
-            currentNode->rightChild = new BSPNode(minPos, maxPos, (nextPartition + 1) % 3, currentNode);
+            cnt++;
+            minPos[maxPartition] = mean;
+            maxPos[maxPartition] = tmpMax;
+            currentNode->rightChild = new BSPNode(minPos, maxPos, currentNode);
             nodes.push(currentNode->rightChild);
+            cnt++;
         }
         nodes.pop();
     }
+    //std::cout << "### cnt: " << cnt << std::endl;
     return;
 }
 
