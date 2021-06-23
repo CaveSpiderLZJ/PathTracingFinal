@@ -19,11 +19,11 @@
 
 #define MAX_DEPTH 6            // 光线跟踪最大迭代次数
 #define RR 3                    // 俄罗斯轮盘赌终结
-#define TMIN 1e-3
-#define DELTA 1e-4
+#define TMIN 1e-4
+#define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 2000    // 蒙特卡洛光线追踪采样率
-#define THREAD_NUM 12        // 线程数
+#define SAMPLING_TIMES 200    // 蒙特卡洛光线追踪采样率
+#define THREAD_NUM 12       // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity, unsigned short* seed){
     // 输入折射率，反射率，用轮盘赌决定光线种类，折射反射漫反射返回012

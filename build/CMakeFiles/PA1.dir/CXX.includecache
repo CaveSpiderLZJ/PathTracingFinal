@@ -287,6 +287,8 @@ material.hpp
 /mnt/d/vsc/CG/Final/code/src/material.hpp
 stb_image.h
 /mnt/d/vsc/CG/Final/code/src/stb_image.h
+cmath
+-
 
 /mnt/d/vsc/CG/Final/code/src/mesh.cpp
 mesh.hpp
