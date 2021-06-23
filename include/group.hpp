@@ -41,11 +41,14 @@ public:
         Material* m = nullptr;
         bool isIntersected = false;
         for(Object3D* object : objects){
-            if(object->intersect(ray, hit, tmin, u, v) && hit.getT() < t){
+            float tmpU = 0.0f, tmpV = 0.0f;
+            if(object->intersect(ray, hit, tmin, tmpU, tmpV) && hit.getT() < t){
                 isIntersected = true;
                 t = hit.getT();
                 n = hit.getNormal().normalized();
                 m = hit.getMaterial();
+                u = tmpU;
+                v = tmpV;
             }
         }
         if(!isIntersected) return false;

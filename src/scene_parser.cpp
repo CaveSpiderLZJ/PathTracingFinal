@@ -251,6 +251,7 @@ Material *SceneParser::parseMaterial() {
     float refractiveIndex = 1.0f;
     Fresnel fresnel;
     int width = 0, height = 0;
+    float textureScale = 1.0f;
     getToken(token);
     assert (!strcmp(token, "{"));
     while (true) {
@@ -269,13 +270,15 @@ Material *SceneParser::parseMaterial() {
             fresnel = parseFresnel();
         else if(strcmp(token, "texture") == 0)
             getToken(filename);
+        else if(strcmp(token, "textureScale") == 0)
+            textureScale = readFloat();
         else{
             assert (!strcmp(token, "}"));
             break;
         }
     }
     auto *answer = new Material(diffuseColor, specularColor, luminance, shininess,
-        refractiveIndex, fresnel, filename);
+        refractiveIndex, fresnel, filename, textureScale);
     return answer;
 }
 
