@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 400
-    height 400
+    width 800
+    height 800
     focus 25
     field 0.2
 }
@@ -78,19 +78,28 @@ Group {
         offset -5
     }
     MaterialIndex 8
-    Plane {
-	    normal 0 1 0
-        offset -5
+    Transform {
+        Translate 5 0 5
+        Plane {
+            normal 0 1 0
+            offset -5
+        }
     }
     MaterialIndex 8
-    Plane {
-	    normal 0 -1 0
-        offset -5
+    Transform {
+        Translate -5 0 5
+        Plane {
+            normal 0 -1 0
+            offset -5
+        }
     }
     MaterialIndex 9
-    Plane {
-	    normal 0 0 1
-        offset -5
+    Transform {
+        Translate -5 -5 0
+        Plane {
+            normal 0 0 1
+            offset -5
+        }
     }
     MaterialIndex 0
     Plane {
