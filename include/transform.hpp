@@ -17,12 +17,11 @@ static Vector3f transformDirection(const Matrix4f &mat, const Vector3f &dir) {
 // TODO: implement this class so that the intersect function first transforms the ray
 class Transform : public Object3D {
 
-protected:
+public:
 
     Object3D *obj; //un-transformed object
     Matrix4f transform;
 
-public:
     Transform() {}
 
     Transform(const Matrix4f &m, Object3D *_obj) : obj(_obj) {
@@ -33,13 +32,13 @@ public:
     }
 
     virtual bool intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
-        Vector3f trSource = transformPoint(transform, ray.getOrigin());
-        Vector3f trDirection = transformDirection(transform, ray.getDirection());
-        Ray tr(trSource, trDirection.normalized());
+        Vector3f trSource = transformPoint(transform, ray.origin);
+        Vector3f trDirection = transformDirection(transform, ray.direction);
+        Ray tr(trSource, trDirection);
         bool isIntersected = obj->intersect(tr, hit, tmin, u, v);
         if(!isIntersected) return false;
-        Vector3f transformedN = transformDirection(transform.transposed(), hit.getNormal());
-        hit.set(hit.getT() / trDirection.length(), hit.getMaterial(), transformedN);
+        Vector3f transformedN = transformDirection(transform.transposed(), hit.normal);
+        hit.set(hit.t / trDirection.length(), hit.material, transformedN);
         return true;
     }
 };

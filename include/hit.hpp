@@ -18,12 +18,13 @@ public:
     Hit() {
         material = nullptr;
         t = 1e38;
+        normal = Vector3f(1, 0, 0);
     }
 
     Hit(float _t, Material *m, const Vector3f &n) {
         t = _t;
         material = m;
-        normal = n;
+        normal = n.normalized();
     }
 
     Hit(const Hit &hit) {
@@ -56,7 +57,7 @@ public:
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Hit &h) {
-    os << "Hit <" << h.getT() << ", " << h.getNormal() << ">";
+    os << "Hit <" << h.t << ", " << h.normal << ">";
     return os;
 }
 

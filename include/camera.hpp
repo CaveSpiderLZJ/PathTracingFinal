@@ -8,8 +8,9 @@
 #include <cstdlib>
 
 class Camera {
+    
+public:
 
-protected:
     // Extrinsic parameters
     Vector3f center;
     Vector3f direction;
@@ -19,7 +20,6 @@ protected:
     int width;
     int height;
 
-public:
     Camera(const Vector3f &center, const Vector3f &direction, const Vector3f &up, int imgW, int imgH) {
         this->center = center;
         this->direction = direction.normalized();
@@ -43,15 +43,14 @@ public:
 // TODO: Implement Perspective camera
 // You can add new functions or variables whenever needed.
 class PerspectiveCamera : public Camera {
-
-private:
  
+public:
+
     float angle;
     float dis;
     float focus;    // 焦平面距离
     float field;    // 光圈大小
 
-public:
     PerspectiveCamera(const Vector3f &center, const Vector3f &direction,
         const Vector3f &up, int imgW, int imgH, float _angle, float _focus = 0.0f , float _field = 0.0f)
         :Camera(center, direction, up, imgW, imgH){

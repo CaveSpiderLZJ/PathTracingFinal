@@ -22,7 +22,7 @@
 #define TMIN 1e-4
 #define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 30    // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 100    // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 12       //
 
 static omp_lock_t lock;
@@ -70,7 +70,7 @@ void mcRayTracing(SceneParser* parser, Image* img, int x){
                 float u = 0.0f, v = 0.0f;
                 bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN, u, v);
                 Material* material = hit.material;
-                Vector3f normal = hit.normal.normalized();
+                Vector3f normal = hit.normal;
                 bool isOutside = true;      // 入射光线是否在物体外面
                 if(Vector3f::dot(currentRay.direction, normal) > 0.0f){
                     isOutside = false;
@@ -85,7 +85,7 @@ void mcRayTracing(SceneParser* parser, Image* img, int x){
                     float reflectIntensity = 0.0f, refractIntensity = 0.0f;
                     Vector3f refractDirection;
                     Fresnel fresnel = material->fresnel;
-                    float dotIN = 0.0f - Vector3f::dot(currentRay.direction.normalized(), normal);
+                    float dotIN = 0.0f - Vector3f::dot(currentRay.direction, normal);
                     if(isOutside){
                         //光疏到光密，正常计算
                         reflectIntensity = fresnel.fbase + fresnel.fscale * pow((1.0f - dotIN), fresnel.power);
@@ -176,16 +176,13 @@ int main(int argc, char *argv[]) {
 
     SceneParser sceneParser(inputFile.c_str());
     Camera* camera = sceneParser.getCamera();
-    Image img(camera->getWidth(), camera->getHeight());
-    std::queue<int> waited; 
-    for(int i = 0; i < camera->getWidth(); i++)
-        waited.push(i);
+    Image img(camera->width, camera->height);
     struct timeval start, end; 
     gettimeofday(&start, NULL);
     SceneParser* parsers[THREAD_NUM];
     for(int i = 0; i < THREAD_NUM; i++)
         parsers[i] = new SceneParser(inputFile.c_str());
-    int width = camera->getWidth(), cnt = 0;
+    int width = camera->width, cnt = 0;
     #pragma omp parallel for num_threads(THREAD_NUM)
     for(int x = 0; x < width; x++){
         int threadID = omp_get_thread_num();

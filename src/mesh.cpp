@@ -60,11 +60,11 @@ bool Mesh::intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) {
         TriangleIndex& triIndex = triangles[candidates[i]];
         Triangle triangle(vertices[triIndex[0]],
                           vertices[triIndex[1]], vertices[triIndex[2]], material);
-        if(triangle.intersect(ray, hit, tmin, u, v) && hit.getT() < t){
+        if(triangle.intersect(ray, hit, tmin, u, v) && hit.t < t){
             isIntersected = true;
-            t = hit.getT();
-            n = hit.getNormal();
-            m = hit.getMaterial();
+            t = hit.t;
+            n = hit.normal;
+            m = hit.material;
             interIdx = triIndex;
         }
     }

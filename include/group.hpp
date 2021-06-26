@@ -11,13 +11,11 @@
 
 // TODO: Implement Group - add data structure to store a list of Object*
 class Group : public Object3D {
-
-private:
+    
+public:
 
     std::vector<Object3D*> objects;
     int num;
-
-public:
 
     Group() {   
         objects = std::vector<Object3D*>(0);
@@ -42,13 +40,12 @@ public:
         bool isIntersected = false;
         for(Object3D* object : objects){
             float tmpU = 0.0f, tmpV = 0.0f;
-            if(object->intersect(ray, hit, tmin, tmpU, tmpV) && hit.getT() < t){
+            if(object->intersect(ray, hit, tmin, tmpU, tmpV) && hit.t < t){
                 isIntersected = true;
-                t = hit.getT();
-                n = hit.getNormal().normalized();
-                m = hit.getMaterial();
-                u = tmpU;
-                v = tmpV;
+                t = hit.t;
+                n = hit.normal;
+                m = hit.material;
+                u = tmpU; v = tmpV;
             }
         }
         if(!isIntersected) return false;

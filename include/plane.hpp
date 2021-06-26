@@ -38,15 +38,15 @@ public:
     ~Plane() override = default;
 
     bool intersect(const Ray &ray, Hit &hit, float tmin, float& u, float& v) override {
-        float dotND = Vector3f::dot(normal, ray.getDirection().normalized());
+        float dotND = Vector3f::dot(normal, ray.direction);
         if(dotND == 0) return false;
-        float t = (d - Vector3f::dot(normal, ray.getOrigin())) / dotND;
+        float t = (d - Vector3f::dot(normal, ray.origin)) / dotND;
         if(t < tmin) return false;
         Vector3f n;
-        if(Vector3f::dot(ray.getDirection(), normal) > 0.0f) n = -1 * normal;
+        if(Vector3f::dot(ray.direction, normal) > 0.0f) n = -1 * normal;
         else n = normal;
         hit.set(t, material, n);
-        Vector3f intersect = ray.origin + ray.direction.normalized() * t - (d * normal); // 平移到以原点为中心的交点
+        Vector3f intersect = ray.origin + ray.direction * t - (d * normal); // 平移到以原点为中心的交点
         u = Vector3f::dot(w2, intersect);
         v = Vector3f::dot(w1, intersect);
         return true;

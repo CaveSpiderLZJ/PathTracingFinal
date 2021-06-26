@@ -30,8 +30,8 @@ public:
 	bool intersect(const Ray& ray, Hit& hit, float tmin, float& u, float& v) override {
         Vector3f E1 = vertices[0] - vertices[1];
         Vector3f E2 = vertices[0] - vertices[2];
-        Vector3f S = vertices[0] - ray.getOrigin();
-        Vector3f Rd = ray.getDirection().normalized();
+        Vector3f S = vertices[0] - ray.origin;
+        Vector3f Rd = ray.direction;
         float divisor = Matrix3f(Rd, E1, E2).determinant();
         if(divisor == 0.0f) return false;
         // t, beta, gamma
