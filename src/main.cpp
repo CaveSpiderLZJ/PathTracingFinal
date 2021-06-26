@@ -22,8 +22,8 @@
 #define TMIN 1e-4
 #define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 50    // 蒙特卡洛光线追踪采样率
-#define THREAD_NUM 10       // 线程数
+#define SAMPLING_TIMES 3000    // 蒙特卡洛光线追踪采样率
+#define THREAD_NUM 12       // 线程数
 
 int randType(const float& reflectIntensity, const float& refractIntensity, unsigned short* seed){
     // 输入折射率，反射率，用轮盘赌决定光线种类，折射反射漫反射返回012
@@ -80,9 +80,11 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                     // 进行一次采样，直接加到color中
                     Hit hit;
                     float u = 0.0f, v = 0.0f;
-                    //std::cout << "### before intersect" << std::endl;
                     bool isIntersect = baseGroup->intersect(currentRay, hit, TMIN, u, v);
-                    //std::cout << "### after intersect" << std::endl;
+                    Material* material = hit.material;
+                    //std::cout << "### before delta normal" << std::endl;
+                    // hit.normal += material->getDeltaNormal(hit.normal, u, v);
+                    //std::cout << "### after delta normal" << std::endl;
                     Vector3f normal = hit.normal.normalized();
                     bool isOutside = true;      // 入射光线是否在物体外面
                     if(Vector3f::dot(currentRay.direction, normal) > 0.0f){
@@ -97,7 +99,6 @@ void mcRayTracing(std::string inputFile, Image* img, int threadID){
                             Vector3f::dot(currentRay.direction, normal);
                         float reflectIntensity = 0.0f, refractIntensity = 0.0f;
                         Vector3f refractDirection;
-                        Material* material = hit.material;
                         Fresnel fresnel = material->fresnel;
                         float dotIN = 0.0f - Vector3f::dot(currentRay.direction.normalized(), normal);
                         if(isOutside){

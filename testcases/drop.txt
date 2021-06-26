@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 256
-    height 256
+    width 800
+    height 800
     focus 25
     field 0
 }
@@ -15,7 +15,7 @@ Background {
 }
 
 Materials {
-    numMaterials 10
+    numMaterials 11
     Material { 
         diffuseColor 0.9 0.88 0.85
     }
@@ -83,6 +83,16 @@ Materials {
         texture texture/grid.png
         textureScale 0.1
     }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/white_wall.png
+        textureScale 0.1
+        Fresnel {
+            fbase 0.25
+            fscale 0
+            power 1
+        }
+    }
 }
 
 Group {
@@ -92,20 +102,29 @@ Group {
 	    normal 1 0 0
         offset -5
     }
-    MaterialIndex 1
-    Plane {
-	    normal 0 1 0
-        offset -5
+    MaterialIndex 10
+    Transform {
+        Translate 5 0 5
+        Plane {
+            normal 0 1 0
+            offset -5
+        }
     }
-    MaterialIndex 2
-    Plane {
-	    normal 0 -1 0
-        offset -5
+    MaterialIndex 10
+    Transform {
+        Translate -5 0 5
+        Plane {
+            normal 0 -1 0
+            offset -5
+        }
     }
     MaterialIndex 8
-    Plane {
-	    normal 0 0 1
-        offset -5
+    Transform {
+        Translate -5 -5 0
+        Plane {
+            normal 0 0 1
+            offset -5
+        }
     }
     MaterialIndex 0
     Plane {
