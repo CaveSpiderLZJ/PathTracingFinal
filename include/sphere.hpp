@@ -35,7 +35,7 @@ public:
         bool isAhead;
         float disCenter2Ray = disPoint2Ray(center, ray, isAhead);
         if(disCenter2Ray > radius) return false;
-        float disCenter2Origin = disPoint2Point(center, ray.getOrigin());
+        float disCenter2Origin = disPoint2Point(center, ray.origin);
         float t;
         Vector3f intersect;
         Vector3f normal;
@@ -45,18 +45,18 @@ public:
             // origin outside the sphere
             if(!isAhead) return false;
             else{
-                t = (disFoot2Origin - disFoot2Intersect) / ray.getDirection().normalized().length();
+                t = (disFoot2Origin - disFoot2Intersect);
                 if(t < tmin) return false;
-                intersect = ray.getOrigin() + t * ray.getDirection().normalized();
+                intersect = ray.origin + t * ray.direction;
                 normal = (intersect - center).normalized();
             }
         }
         else{
             // origin inside the sphere 
-            if(isAhead) t = (disFoot2Origin + disFoot2Intersect) / ray.getDirection().normalized().length();
-            else t = (disFoot2Intersect - disFoot2Origin) / ray.getDirection().normalized().length();
+            if(isAhead) t = (disFoot2Origin + disFoot2Intersect);
+            else t = (disFoot2Intersect - disFoot2Origin);
             if(t < tmin)return false;
-            intersect = ray.getOrigin() + t * ray.getDirection().normalized();
+            intersect = ray.origin + t * ray.direction;
             normal = (center - intersect).normalized();
         }
         Vector3f dir = intersect - center;

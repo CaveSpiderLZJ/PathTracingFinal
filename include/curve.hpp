@@ -32,9 +32,8 @@ public:
     Bernstein(int _n, double _t): n(_n), t(_t){
         // 初始化
         res = new double[(n + 1) * (n + 1)];
-        for(int i = 0; i < (n + 1) * (n + 1); i++){
+        for(int i = 0; i < (n + 1) * (n + 1); i++)
             res[i] = -1.0;
-        }
         // 计算端点值
         tpow = new double[n + 1];     // t^{n}
         qpow = new double[n + 1];     // (1-t)^{n}
@@ -42,12 +41,10 @@ public:
             tpow[i] = pow(t, i);
             qpow[i] = pow(1 - t, i);
         }
-        for(int j = 0; j <= n; j++){
+        for(int j = 0; j <= n; j++)
             res[j] = qpow[j];
-        }
-        for(int i = 1; i <= n; i++){
+        for(int i = 1; i <= n; i++)
             res[i * (n + 1) + i] = tpow[i];
-        }
         // dp计算其他B_{i, n}
         for(int i = 1; i < n; i++){
             for(int j = i + 1; j <= n; j++){
@@ -69,11 +66,8 @@ public:
     }
 
     double dbasis(int i, int p){
-        if(i <= 0)
-            return -1 * p * qpow[p - 1];
-        if(i == p){
-            return p * tpow[p - 1];
-        }
+        if(i <= 0) return -1 * p * qpow[p - 1];
+        if(i == p) return p * tpow[p - 1];
         return double(p) * (res[(i-1) * (n+1) + (p-1)] - res[i * (n+1) + (p-1)]);
     }
 };
@@ -87,20 +81,17 @@ public:
     BsplineBase(int _n, int _k, double _t): n(_n), k(_k), t(_t){
         // 初始化
         res = new double[(n + k + 1) * (k + 1)];
-        for(int i = 0; i < (n + k + 1) * (k + 1); i++){
+        for(int i = 0; i < (n + k + 1) * (k + 1); i++)
             res[i] = -1.0;
-        }
         // 计算初值
-        for(int i = 0; i <= n + k; i++){
+        for(int i = 0; i <= n + k; i++)
             res[i * (k + 1)] = 0;
-        }
         int index = int(t * (n + k + 1));
         res[index * (k + 1)] = 1;
         // dp计算B_{i, p}
         for(int j = 1; j <= k; j++){
             for(int i = 0; i <= n + k; i++){
-                if(i + j > n + k)
-                    continue;
+                if(i + j > n + k) continue;
                 res[i * (k+1) + j] = ((t * (n+k+1) - i) / j) * res[i * (k+1) + j-1]
                  + ((i+j+1 - t * (n+k+1)) / j) * res[(i+1) * (k+1) + j-1];
             }

@@ -6,14 +6,12 @@
 
 // Simple image class
 class Image {
-    
-private:
+
+public:
 
     int width;
     int height;
-    Vector3f *data;    
-
-public:
+    Vector3f *data;   
 
     Image(int w, int h) {
         width = w;
