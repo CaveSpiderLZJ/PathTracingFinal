@@ -4,8 +4,8 @@ PerspectiveCamera {
     direction -1 0 0
     up 0 0 1
     angle 40
-    width 800
-    height 800
+    width 256
+    height 256
     focus 25
     field 0
 }
@@ -47,9 +47,9 @@ Materials {
         diffuseColor 1 1 1
         refractiveIndex 1.5
         Fresnel {
-            fbase 0.1
-            fscale 0.87
-            power 5
+            fbase 0.05
+            fscale 0.92
+            power 10
         }
     }
     Material {
@@ -136,7 +136,7 @@ Group {
         center 0 0 604.995
         radius 600
     }
-    MaterialIndex 5
+    MaterialIndex 6
     Transform {
         Translate 2.2 0 -2
         XRotate 90

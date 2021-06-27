@@ -1,0 +1,122 @@
+
+PerspectiveCamera {
+    center 20 0 0
+    direction -1 0 0
+    up 0 0 1
+    angle 40
+    width 960
+    height 540
+    focus 20
+    field 0
+}
+
+Background {
+    color 0.102 0.129 0.156
+}
+
+Materials {
+    numMaterials 6
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/milkyway_s.png
+        textureScale 0.0114
+        textureLuminance 1
+    }
+    Material {
+        diffuseColor 1 1 1
+        luminance 12 12 12
+    }
+    Material { 
+        diffuseColor 0.9 0.88 0.85
+        texture texture/earth.png
+    }
+    Material {
+        diffuseColor 0.9 0.88 0.85
+        texture texture/moon.png
+    }
+    Material {
+        diffuseColor 0.95 0.95 0.95
+        Fresnel {
+            fbase 0.85
+            fscale 0
+            power 1
+        }
+    }
+    Material {
+        diffuseColor 1 1 1
+        refractiveIndex 1.1
+        Fresnel {
+            fbase 0.03
+            fscale 0.94
+            power 10
+        }
+    }
+}
+
+Group {
+    numObjects 8
+    MaterialIndex 0
+    Transform {
+        Translate 0 -44 48
+        Plane {
+            normal 1 0 0
+            offset -100
+        }
+    }
+    MaterialIndex 2
+    Transform {
+        Translate 8 0 -11
+        ZRotate 180
+        YRotate 60
+        XRotate -35
+        Sphere {
+            center 0 0 0
+            radius 10
+        }
+    }
+    MaterialIndex 3
+    Transform {
+        Translate -5 -4.5 2.6
+        ZRotate -90
+        Sphere {
+            center 0 0 0
+            radius 1.5
+        }
+    }
+    MaterialIndex 1
+    Sphere {
+        center 20 30 30
+        radius 20
+    }
+    MaterialIndex 4
+    Transform {
+        Translate 5 2 0.8
+        Scale 0.5 0.5 0.5
+        XRotate 30
+        ZRotate 30
+        RevSurface {
+            profile BezierCurve {
+                controls
+                    [ 0 6 0 ]
+                    [ 2.25 1.5 0 ]
+                    [ 2.25 -2 0 ]
+                    [ 0 -2 0 ]
+            }
+        }
+    }
+    MaterialIndex 5
+    Sphere {
+        center 10 -2.6 -0.3
+        radius 0.6
+    }
+    MaterialIndex 5
+    Sphere {
+        center 12 -0.6 -0.72
+        radius 0.6
+    }
+    MaterialIndex 5
+    Sphere {
+        center 10 2 -0.9
+        radius 0.4
+    }
+}

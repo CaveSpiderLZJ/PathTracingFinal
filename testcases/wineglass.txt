@@ -1,0 +1,187 @@
+
+PerspectiveCamera {
+    center 20 0 0
+    direction -1 0 0
+    up 0 0 1
+    angle 40
+    width 800
+    height 800
+    focus 18.5
+    field 0.5
+}
+
+Background {
+    color 0 0 0
+}
+
+Materials {
+    numMaterials 11
+    Material { 
+        diffuseColor 0.9 0.88 0.85
+    }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/white_wall.png
+        textureScale 0.1
+        Fresnel {
+            fbase 0.25
+            fscale 0
+            power 1
+        }
+    }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/wood.png
+        textureScale 0.1
+        Fresnel {
+            fbase 0.1
+            fscale 0
+            power 1
+        }
+    }
+    Material { 
+        diffuseColor 0 0.8 1
+        luminance 0 0.8 1
+    }
+    Material { 
+        diffuseColor 1 0.32 0.32
+        luminance 1 0.32 0.32
+    }
+    Material { 
+        diffuseColor 0.406 0.93 0.539
+    }
+    Material {
+        diffuseColor 1 0.6 0
+        Fresnel {
+            fbase 0.85
+            fscale 0
+            power 1
+        }
+    }
+    Material {
+        diffuseColor 1 1 1
+        luminance 10 10 10
+    }
+    Material {
+        diffuseColor 0.95 0.95 0.95
+        Fresnel {
+            fbase 0.95
+            fscale 0
+            power 1
+        }
+    }
+    Material {
+        diffuseColor 1 1 1
+        refractiveIndex 1.5
+        Fresnel {
+            fbase 0.05
+            fscale 0.92
+            power 10
+        }
+    }
+    Material { 
+        diffuseColor 1 1 1
+        texture texture/grid.png
+        textureScale 0.1
+    }
+}
+
+Group {
+    numObjects 11
+    MaterialIndex 10
+    Plane {
+	    normal 1 0 0
+        offset -5
+    }
+    MaterialIndex 1
+    Transform {
+        Translate 5 0 5
+        Plane {
+            normal 0 1 0
+            offset -5
+        }
+    }
+    MaterialIndex 1
+    Transform {
+        Translate -5 0 5
+        Plane {
+            normal 0 -1 0
+            offset -5
+        }
+    }
+    MaterialIndex 2
+    Transform {
+        Translate -5 -5 0
+        Plane {
+            normal 0 0 1
+            offset -5
+        }
+    }
+    MaterialIndex 0
+    Plane {
+	    normal 0 0 -1
+        offset -5
+    }
+    MaterialIndex 7
+    Sphere {
+        center 0 0 604.995
+        radius 600
+    }
+    MaterialIndex 9
+    Transform {
+        Translate 0 0 -1.31
+        XRotate 90
+        Scale 1.5 1.5 1.5
+        RevSurface {
+            profile BsplineCurve {
+                controls
+                    [ 0.000000 -0.459543 0.0 ]
+                    [ 0.000000 -0.459544 0.0 ]
+                    [ 0.000000 -0.459545 0.0 ]
+                    [ 0.351882 -0.426747 0.0 ]
+                    [ 0.848656 -0.278898 0.0 ]
+                    [ 1.112097 0.084005 0.0 ]
+                    [ 1.164785 1.105511 0.0 ]
+                    [ 0.991667 2.328629 0.0 ]
+                    [ 1.029301 2.503360 0.0 ]
+                    [ 1.088800 2.345600 0.0 ]
+                    [ 1.278000 1.162800 0.0 ]
+                    [ 1.214800 0.055200 0.0 ]
+                    [ 0.915600 -0.381200 0.0 ]
+                    [ 0.380400 -0.622000 0.0 ]
+                    [ 0.144000 -0.968400 0.0 ]
+                    [ 0.096800 -1.480000 0.0 ]
+                    [ 0.128400 -2.112400 0.0 ]
+                    [ 0.317200 -2.202800 0.0 ]
+                    [ 0.994400 -2.262800 0.0 ]
+                    [ 1.214800 -2.323200 0.0 ]
+                    [ 1.199200 -2.398400 0.0 ]
+                    [ 1.057600 -2.458800 0.0 ]
+                    [ 0.711200 -2.458800 0.0 ]
+                    [ 0.000000 -2.458800 0.0 ]
+                    [ 0.000000 -2.458801 0.0 ]
+                    [ 0.000000 -2.458802 0.0 ]
+            }
+        }
+    }
+    MaterialIndex 3
+    Sphere {
+        center -3.5 -2.5 -3.5
+        radius 1.5
+    }
+    MaterialIndex 5
+    Sphere {
+        center -2 3.5 -3.5
+        radius 1.5
+    }
+    MaterialIndex 6
+    Sphere {
+        center 2.5 -3.5 -3.5
+        radius 1.5
+    }
+    MaterialIndex 4
+    Sphere {
+        center 4.5 3.5 -3.5
+        radius 1.5
+    }
+}

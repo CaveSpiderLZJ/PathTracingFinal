@@ -22,7 +22,7 @@
 #define TMIN 1e-4
 #define DELTA 1e-5
 #define PROGRESS_NUM 5         // 画图时进度信息数目 
-#define SAMPLING_TIMES 100    // 蒙特卡洛光线追踪采样率
+#define SAMPLING_TIMES 3000    // 蒙特卡洛光线追踪采样率
 #define THREAD_NUM 12       //
 
 static omp_lock_t lock;
@@ -126,12 +126,12 @@ void mcRayTracing(SceneParser* parser, Image* img, int x){
                         if(erand48(seed) < rgbMax && currentRay.depth <= MAX_DEPTH)
                             ratio = 1 / rgbMax;
                         else{
-                            color += material->luminance * currentRay.pastColor;
+                            color += material->getLuminance(u, v) * currentRay.pastColor;
                             break;
                         }
                     }
                     int type = randType(reflectIntensity, refractIntensity, seed);
-                    color += material->luminance * currentRay.pastColor;
+                    color += material->getLuminance(u, v) * currentRay.pastColor;
                     currentRay.pastColor = currentRay.pastColor * material->getDiffuseColor(u, v) * ratio;  
                     // 轮盘赌确定下一次光线是反射折射还是漫反射
                     if(type == 0){

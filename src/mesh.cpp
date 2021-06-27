@@ -137,19 +137,17 @@ Mesh::Mesh(const char *filename, Material *material) : Object3D(material) {
 
 Mesh::Mesh(const std::vector<Vector3f>& v, Material* mat, int m, int n){
     // 旋转曲面的离散点阵列，m行，n列，每行是一条曲线
-    // 保证第一列和最后一列分别是同一个点
-    // 构建离散的三角形面片
+    // 保证第一列和最后一列分别是同一个点，构建离散的三角形面片
     material = mat;
     vertices = v;
     for(int i = 0; i < m; i++){
         for(int j = 0; j < n - 1; j++){
             int delta = (i < m-1) ? 0 : (m*n);
-            TriangleIndex tri1;
+            TriangleIndex tri1, tri2;
             tri1[0] = i * n + j;
             tri1[2] = tri1[0] + 1;
             tri1[1] = tri1[2] + n - delta;
             triangles.push_back(tri1);
-            TriangleIndex tri2;
             tri2[0] = i * n + j;
             tri2[1] = tri2[0] + n - delta;
             tri2[2] = tri2[1] + 1;
@@ -252,7 +250,7 @@ void Mesh::computeTriangle(BSPNode* node){
             testIdx.push_back(father->triangleIdx[i]);
     }
     for(int i = 0; i < testIdx.size(); i++){
-        // i 是三角形编号，检查这个三角形是否有某点在包围盒里
+        // testIdx[i]是三角形编号，获取三角形包围盒
         triMinPos = Vector3f(1e8, 1e8, 1e8);
         triMaxPos = Vector3f(-1e8, -1e8, -1e8);
         for(int j = 0; j < 3; j++){
@@ -262,7 +260,7 @@ void Mesh::computeTriangle(BSPNode* node){
                 if(pos[k] > triMaxPos[k]) triMaxPos[k] = pos[k];
             }
         }
-        // 判断三角形和长方体包围盒是否相交
+        // 判断三角形和节点包围盒是否相交
         bool inter = true;
         for(int j = 0; j < 3; j++){
             if(fabs(triMinPos[j] + triMaxPos[j] - minPos[j] - maxPos[j])

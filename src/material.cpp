@@ -14,10 +14,10 @@ Fresnel::Fresnel(const float& _fbase, const float& _fscale, const float& _power)
 
 Material::Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor,
     const Vector3f& _luminance, float _shininess, float _refractiveIndex,
-    Fresnel _fresnel, const char* filePath, float _textureScale, int _uneven):
+    Fresnel _fresnel, const char* filePath, float _textureScale, float _textureLuminance):
     diffuseColor(_diffuseColor), specularColor(_specularColor), luminance(_luminance),
     shininess(_shininess), refractiveIndex(_refractiveIndex), fresnel(_fresnel),
-    textureScale(_textureScale), uneven(_uneven){
+    textureScale(_textureScale), textureLuminance(_textureLuminance){
     if(filePath[0] != 0)
         texture = stbi_load(filePath, &w, &h, &n, 0);
     else texture = nullptr;
@@ -36,8 +36,22 @@ Vector3f Material::getDiffuseColor(float u, float v) const {
     return Vector3f(r, g, b);
 }
 
+Vector3f Material::getLuminance(float u, float v) const {
+    if(textureLuminance == 0.0f) return luminance;
+    u *= textureScale; v *= textureScale;
+    u -= floor(u); v -= floor(v);
+    int idx = n * w * int(v * h) + int(u * w) * n;
+    if(idx < 0) idx = 0;
+    if(idx > n * w * h - 3) idx = n * w * h - 3;
+    float r = texture[idx + 0] / 256.0f;
+    float g = texture[idx + 1] / 256.0f;
+    float b = texture[idx + 2] / 256.0f;
+    return Vector3f(r, g, b);
+}
+
 Vector3f Material::getDeltaNormal(const Vector3f& normal, float u, float v){
-    if(uneven == 0) return Vector3f::ZERO;
+    // deprecated
+    return Vector3f::ZERO;
     u *= textureScale; v *= textureScale;
     u -= floor(u); v -= floor(v);
     int row = u * w, col = v * h;

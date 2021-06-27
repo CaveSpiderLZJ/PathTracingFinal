@@ -38,18 +38,21 @@ public:
     Fresnel fresnel;
     unsigned char* texture;
     float textureScale;
+    float textureLuminance;
     int w, h, n;
-    int uneven;
 
     Material() = delete;
 
     explicit Material(const Vector3f &_diffuseColor, const Vector3f &_specularColor = Vector3f::ZERO,
         const Vector3f& _luminance = Vector3f::ZERO, float _shininess = 0, float _refractiveIndex = 1.0f,
-        Fresnel _fresnel = Fresnel(), const char* filePath = "\0", float textureScale = 1.0f, int ueven = 0);
+        Fresnel _fresnel = Fresnel(), const char* filePath = "\0",
+        float textureScale = 1.0f, float textureLuminance = 0.0f);
 
     virtual ~Material() = default;
 
     virtual Vector3f getDiffuseColor(float u = 0.0f, float v = 0.0f) const;
+
+    virtual Vector3f getLuminance(float u = 0.0f, float v = 0.0f) const;
 
     virtual Vector3f getDeltaNormal(const Vector3f& normal, float u, float v);
 

@@ -6,10 +6,10 @@
 #include "mesh.hpp"
 #include <tuple>
 
-#define RESOLUTION 10
-#define THETA_RES 36
+#define RESOLUTION 20
+#define THETA_RES 40
 #define ITER 10
-#define LEARNING_RATE 0.05f
+#define LEARNING_RATE 0.02f
 
 class RevSurface : public Object3D {
 
@@ -82,7 +82,6 @@ public:
             return false;
         }
         else return false;
-        //return mesh->intersect(ray, hit, tmin, u, v);
     }
 };
 
