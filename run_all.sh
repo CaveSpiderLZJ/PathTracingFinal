@@ -33,4 +33,4 @@ mkdir -p output
 # bin/PA1 testcases/porcelain.txt output/porcelain.bmp
 # bin/PA1 testcases/texture.txt output/texture.bmp
 # bin/PA1 testcases/threebody.txt output/threebody.bmp
-bin/PA1 testcases/wineglass.txt output/wineglass.bmp
+# bin/PA1 testcases/wineglass.txt output/wineglass.bmp
